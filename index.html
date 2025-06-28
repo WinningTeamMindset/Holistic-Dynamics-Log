@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-900">
 <head>
     <meta charset="UTF-8">
@@ -220,11 +220,11 @@
                 const data = {};
                 logStructure.forEach(section => {
                     if (section.type === 'mental_skills') {
+                        data.mentalSkills = {}; // Use a dedicated object for this section
                         section.params.forEach(param => {
-                            data[param.id] = { checked: false, score: '', comment: '' };
+                            data.mentalSkills[param.id] = { checked: false, score: '', comment: '' };
                         });
                     } else {
-                        // Ensure analyst-comments object exists for other sections
                         if (!data['analyst-comments']) {
                             data['analyst-comments'] = {};
                         }
@@ -237,12 +237,14 @@
                 return data;
             };
 
+
             // --- Data Persistence ---
 
             const saveData = () => {
                 try {
                     localStorage.setItem('dynamicsLogPlayers', JSON.stringify(players));
                     localStorage.setItem('dynamicsLogActivePlayer', activePlayerId);
+                    localStorage.setItem('dynamicsLogStructure', JSON.stringify(logStructure));
                 } catch (e) {
                     console.error("Failed to save data to localStorage", e);
                     showToast("Error: Could not save data.");
@@ -253,6 +255,16 @@
                 try {
                     const savedPlayers = localStorage.getItem('dynamicsLogPlayers');
                     const savedActivePlayer = localStorage.getItem('dynamicsLogActivePlayer');
+                    const savedStructure = localStorage.getItem('dynamicsLogStructure');
+
+                    if (savedStructure) {
+                        const loadedStructure = JSON.parse(savedStructure);
+                        // Simple validation to ensure it's not a broken structure
+                        if (Array.isArray(loadedStructure) && loadedStructure.length > 0) {
+                           Object.assign(logStructure, loadedStructure);
+                        }
+                    }
+
                     if (savedPlayers) {
                         players = JSON.parse(savedPlayers);
                     }
@@ -308,7 +320,13 @@
                                             </tr>
                                         `).join('')}
                                     </tbody>
-                                </table>`;
+                                </table>
+                                <!-- ADD NEW SKILL UI -->
+                                <div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2">
+                                    <input id="new-skill-input" type="text" placeholder="New technique name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
+                                    <button id="add-skill-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Technique</button>
+                                </div>
+                                `;
                     } else {
                         html += `
                                 <table class="min-w-full divide-y divide-gray-700">
@@ -340,6 +358,8 @@
                      html += `</div></fieldset>`;
                 });
                 logFormContainer.innerHTML = html;
+                // Need to re-attach listener for the new button after re-render
+                document.getElementById('add-skill-btn')?.addEventListener('click', handleAddSkill);
             };
 
             const updatePlayerDropdown = () => {
@@ -367,11 +387,11 @@
                     const subtype = input.dataset.subtype;
 
                     if (subtype) { // This is a mental skills input
-                        if(player.data[dataId]) {
+                        if(player.data.mentalSkills && player.data.mentalSkills[dataId]) {
                              if (subtype === 'checked') {
-                                input.checked = player.data[dataId].checked || false;
+                                input.checked = player.data.mentalSkills[dataId].checked || false;
                             } else {
-                                input.value = player.data[dataId][subtype] || '';
+                                input.value = player.data.mentalSkills[dataId][subtype] || '';
                             }
                         }
                     } else if (input.dataset.type === 'comment') { // Standard analyst comment
@@ -420,7 +440,9 @@
                 }
                 const playerIndex = players.findIndex(p => p.id === activePlayerId);
                 if (playerIndex > -1) {
-                    if (confirm(`Are you sure you want to delete player: ${players[playerIndex].name}?`)) {
+                    // Use a more robust confirmation dialog
+                    const modalConfirm = confirm(`Are you sure you want to delete player: ${players[playerIndex].name}? This cannot be undone.`);
+                    if (modalConfirm) {
                         const playerName = players[playerIndex].name;
                         players.splice(playerIndex, 1);
                         activePlayerId = players.length > 0 ? players[0].id : null;
@@ -435,10 +457,10 @@
                 activePlayerId = e.target.value;
                 if(activePlayerId) {
                     populateForm(activePlayerId);
-                    saveData(); // Save the new active player
                 } else {
                     clearForm();
                 }
+                saveData(); // Save the new active player selection
             };
 
             const handleFormInput = (e) => {
@@ -448,17 +470,17 @@
                 if (!player) return;
 
                 const dataId = e.target.dataset.id;
-                const subtype = e.target.dataset.subtype;
+                const subtype = e.target.subtype;
 
                 if (subtype) { // Mental skills input
-                    // Ensure the data object exists for this skill
-                    if (!player.data[dataId]) {
-                        player.data[dataId] = { checked: false, score: '', comment: '' };
+                    if (!player.data.mentalSkills) player.data.mentalSkills = {};
+                    if (!player.data.mentalSkills[dataId]) {
+                        player.data.mentalSkills[dataId] = { checked: false, score: '', comment: '' };
                     }
                     if(subtype === 'checked') {
-                        player.data[dataId][subtype] = e.target.checked;
+                        player.data.mentalSkills[dataId][subtype] = e.target.checked;
                     } else {
-                        player.data[dataId][subtype] = e.target.value;
+                        player.data.mentalSkills[dataId][subtype] = e.target.value;
                     }
                 } else if (e.target.dataset.type === 'comment') { // Standard comment
                     if (!player.data['analyst-comments']) {
@@ -471,6 +493,41 @@
                 saveData(); // Save on every input change
             };
 
+            const handleAddSkill = () => {
+                const newSkillInput = document.getElementById('new-skill-input');
+                const skillName = newSkillInput.value.trim();
+                if (!skillName) {
+                    showToast("Please enter a name for the new technique.");
+                    return;
+                }
+
+                const skillId = skillName.toLowerCase().replace(/\s+/g, '_') + `_${Date.now()}`;
+                
+                const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
+                if (mentalSkillsSection.params.some(p => p.label.toLowerCase() === skillName.toLowerCase())) {
+                    showToast("This technique already exists.");
+                    return;
+                }
+
+                // 1. Update the log structure definition
+                mentalSkillsSection.params.push({ id: skillId, label: skillName });
+                
+                // 2. Update all existing players to include a data entry for this new skill
+                players.forEach(player => {
+                    if (!player.data.mentalSkills) {
+                        player.data.mentalSkills = {};
+                    }
+                    player.data.mentalSkills[skillId] = { checked: false, score: '', comment: '' };
+                });
+
+                // 3. Re-render the form and save everything
+                newSkillInput.value = '';
+                renderLogForm();
+                populateForm(activePlayerId);
+                saveData();
+                showToast(`Technique "${skillName}" added.`);
+            };
+
             const handleExport = () => {
                 if (!activePlayerId) {
                     showToast("Please select a player to export.");
@@ -479,7 +536,12 @@
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
 
-                const dataStr = JSON.stringify(player, null, 2);
+                const exportData = {
+                    player: player,
+                    structure: logStructure // Export the structure as well
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -499,12 +561,27 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
-                        const importedPlayer = JSON.parse(event.target.result);
+                        const importedData = JSON.parse(event.target.result);
+                        // Backwards compatibility for old format
+                        const importedPlayer = importedData.player ? importedData.player : importedData;
+                        const importedStructure = importedData.structure;
+
                         if (!importedPlayer.id || !importedPlayer.name || !importedPlayer.data) {
                            throw new Error("Invalid file format.");
                         }
+
+                        // If the imported file has a structure, merge it
+                        if (importedStructure) {
+                            const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
+                            const importedMentalSkills = importedStructure.find(s => s.type === 'mental_skills');
+                            
+                            importedMentalSkills.params.forEach(importedParam => {
+                                if (!mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
+                                    mentalSkillsSection.params.push(importedParam);
+                                }
+                            });
+                        }
                         
-                        // Check if player with same ID or name already exists
                         const existingPlayerIndex = players.findIndex(p => p.id === importedPlayer.id || p.name.toLowerCase() === importedPlayer.name.toLowerCase());
                         
                         if (existingPlayerIndex > -1) {
@@ -515,6 +592,9 @@
                            showToast(`Player "${importedPlayer.name}" imported.`);
                         }
                         activePlayerId = importedPlayer.id;
+                        
+                        // Full re-render and save
+                        renderLogForm();
                         updateAndSave();
 
                     } catch (err) {
@@ -548,10 +628,11 @@
             }
             
             function init() {
-                renderLogForm();
                 loadData();
+                renderLogForm();
                 updatePlayerDropdown();
                 if(activePlayerId && players.some(p=>p.id === activePlayerId)) {
+                    playerSelect.value = activePlayerId;
                     populateForm(activePlayerId);
                 } else if (players.length > 0) {
                     activePlayerId = players[0].id;
@@ -567,10 +648,10 @@
                 exportBtn.addEventListener('click', handleExport);
                 importFile.addEventListener('change', handleImport);
                 resetBtn.addEventListener('click', handleReset);
-                 // Add keypress event for adding player with Enter
+                
                 playerNameInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
-                        e.preventDefault(); // Prevent form submission
+                        e.preventDefault();
                         addPlayerBtn.click();
                     }
                 });
