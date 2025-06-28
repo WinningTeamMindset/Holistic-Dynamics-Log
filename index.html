@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Holistic Dynamics Log</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -91,20 +93,55 @@
         <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h1 class="text-2xl font-bold text-teal-400">Holistic Dynamics Log</h1>
-                <!-- Player Management -->
+                <!-- Player Selection -->
                 <div class="flex flex-wrap items-center gap-2">
                     <select id="player-select" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full md:w-auto"></select>
-                    <input id="player-name-input" type="text" placeholder="New player name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
-                    <button id="add-player-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Add Player</button>
-                    <button id="delete-player-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Delete Player</button>
                 </div>
             </div>
+            
+            <div id="pdf-content">
+                <!-- Player Details Section -->
+                 <div id="player-details-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4 border-t border-gray-700 pt-4">
+                    <div>
+                        <label for="log-date" class="block text-sm font-medium text-gray-400">Date</label>
+                        <input type="date" id="log-date" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                     <div>
+                        <label for="player-dob" class="block text-sm font-medium text-gray-400">D.O.B.</label>
+                        <input type="date" id="player-dob" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">Age</label>
+                        <span id="player-age" class="mt-1 flex items-center bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white w-full h-10"></span>
+                    </div>
+                    <div>
+                        <label for="player-position" class="block text-sm font-medium text-gray-400">Position</label>
+                        <input type="text" id="player-position" placeholder="e.g., Forward" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                     <div>
+                        <label for="player-shirt-nr" class="block text-sm font-medium text-gray-400">Shirt Nr.</label>
+                        <input type="number" id="player-shirt-nr" placeholder="e.g., 10" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Player Section -->
+            <div class="flex flex-col sm:flex-row items-end gap-2 mt-4 border-t border-gray-700 pt-4">
+                 <div class="flex-grow">
+                     <label for="player-name-input" class="block text-sm font-medium text-gray-400">New Player Name</label>
+                     <input id="player-name-input" type="text" placeholder="Enter new player name..." class="mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full">
+                 </div>
+                 <button id="add-player-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Add Player</button>
+                 <button id="delete-player-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Delete Active Player</button>
+            </div>
+
              <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-2 mt-4">
-                <button id="reset-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Clear for New Player</button>
-                <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Export Player Data</button>
-                <label for="import-file" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 cursor-pointer flex-1 sm:flex-grow-0 text-center">Import Player Data</label>
+            <div class="flex flex-wrap gap-2 mt-4 border-t border-gray-700 pt-4">
+                <button id="reset-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Clear Form</button>
+                <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Export JSON</button>
+                <label for="import-file" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 cursor-pointer flex-1 sm:flex-grow-0 text-center">Import JSON</label>
                 <input type="file" id="import-file" accept=".json">
+                <button id="pdf-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Save as PDF</button>
             </div>
         </header>
 
@@ -130,8 +167,15 @@
             const resetBtn = document.getElementById('reset-btn');
             const exportBtn = document.getElementById('export-btn');
             const importFile = document.getElementById('import-file');
+            const pdfBtn = document.getElementById('pdf-btn');
             const logFormContainer = document.getElementById('dynamics-form');
             const toastElement = document.getElementById('toast');
+            const logDateInput = document.getElementById('log-date');
+            const playerPositionInput = document.getElementById('player-position');
+            const playerShirtNrInput = document.getElementById('player-shirt-nr');
+            const playerDobInput = document.getElementById('player-dob');
+            const playerAgeSpan = document.getElementById('player-age');
+            const playerDetailsSection = document.getElementById('player-details-section');
 
             // Application State
             let players = [];
@@ -216,8 +260,22 @@
                 }, 3000);
             };
 
+            const calculateAge = (dobString) => {
+                if (!dobString) return '';
+                const dob = new Date(dobString);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                return age;
+            };
+
             const generateNewLogData = () => {
-                const data = {};
+                const data = {
+                    logDate: new Date().toISOString().split('T')[0] // Default to today's date
+                };
                 logStructure.forEach(section => {
                     if (section.type === 'mental_skills') {
                         data.mentalSkills = {}; // Use a dedicated object for this section
@@ -225,12 +283,12 @@
                             data.mentalSkills[param.id] = { checked: false, score: '', comment: '' };
                         });
                     } else {
-                        if (!data['analyst-comments']) {
-                            data['analyst-comments'] = {};
+                        if (!data['comments']) {
+                            data['comments'] = {};
                         }
                         section.params.forEach(param => {
                             data[param.id] = '';
-                            data['analyst-comments'][param.id] = '';
+                            data['comments'][param.id] = '';
                         });
                     }
                 });
@@ -259,7 +317,6 @@
 
                     if (savedStructure) {
                         const loadedStructure = JSON.parse(savedStructure);
-                        // Simple validation to ensure it's not a broken structure
                         if (Array.isArray(loadedStructure) && loadedStructure.length > 0) {
                            Object.assign(logStructure, loadedStructure);
                         }
@@ -299,6 +356,7 @@
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider text-center">RE-DO</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">SCORE (1-10)</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">COMMENTS</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ACTIONS</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -315,7 +373,10 @@
                                                     </select>
                                                 </td>
                                                 <td class="px-4 py-4">
-                                                    <textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specifics..."></textarea>
+                                                    <textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Comments..."></textarea>
+                                                </td>
+                                                <td class="px-4 py-4 text-center">
+                                                    ${param.isCustom ? `<button type="button" class="delete-session-btn text-red-500 hover:text-red-400 font-bold text-xl" data-id="${param.id}">&times;</button>` : ''}
                                                 </td>
                                             </tr>
                                         `).join('')}
@@ -334,7 +395,7 @@
                                         <tr>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Analyst Comments</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">COMMENTS</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -348,7 +409,7 @@
                                                     </select>
                                                 </td>
                                                 <td class="px-4 py-4">
-                                                    <textarea data-id="${param.id}" data-type="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specific examples..."></textarea>
+                                                    <textarea data-id="${param.id}" data-type="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Comments..."></textarea>
                                                 </td>
                                             </tr>
                                         `).join('')}
@@ -358,8 +419,12 @@
                      html += `</div></fieldset>`;
                 });
                 logFormContainer.innerHTML = html;
-                // Need to re-attach listener for the new button after re-render
                 document.getElementById('add-session-btn')?.addEventListener('click', handleAddSession);
+                logFormContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-session-btn')) {
+                        handleDeleteSession(e.target.dataset.id);
+                    }
+                });
             };
 
             const updatePlayerDropdown = () => {
@@ -367,12 +432,13 @@
                 players.forEach(p => {
                     const option = document.createElement('option');
                     option.value = p.id;
-                    option.textContent = p.name;
+                    option.textContent = `${p.name} ${p.shirtNumber ? `(#${p.shirtNumber})` : ''}`;
                     if (p.id === activePlayerId) {
                         option.selected = true;
                     }
                     playerSelect.appendChild(option);
                 });
+                playerDetailsSection.style.display = activePlayerId ? 'grid' : 'none';
             };
 
             const populateForm = (playerId) => {
@@ -382,6 +448,14 @@
                     return;
                 }
                 
+                // Populate player details
+                logDateInput.value = player.data.logDate || new Date().toISOString().split('T')[0];
+                playerPositionInput.value = player.position || '';
+                playerShirtNrInput.value = player.shirtNumber || '';
+                playerDobInput.value = player.dob || '';
+                playerAgeSpan.textContent = calculateAge(player.dob);
+
+                // Populate log data
                 document.querySelectorAll('.log-input').forEach(input => {
                     const dataId = input.dataset.id;
                     const subtype = input.dataset.subtype;
@@ -393,12 +467,16 @@
                             } else {
                                 input.value = player.data.mentalSkills[dataId][subtype] || '';
                             }
+                        } else { // Clear if no data
+                            if (subtype === 'checked') input.checked = false; else input.value = '';
                         }
-                    } else if (input.dataset.type === 'comment') { // Standard analyst comment
-                        if (player.data['analyst-comments']) {
-                           input.value = player.data['analyst-comments'][dataId] || '';
+                    } else if (input.dataset.type === 'comment') {
+                        if (player.data.comments) {
+                           input.value = player.data.comments[dataId] || '';
+                        } else {
+                            input.value = '';
                         }
-                    } else { // Standard select input
+                    } else {
                         input.value = player.data[dataId] || '';
                     }
                 });
@@ -406,6 +484,14 @@
 
             const clearForm = () => {
                 document.getElementById('dynamics-form').reset();
+                logDateInput.value = new Date().toISOString().split('T')[0];
+                playerPositionInput.value = '';
+                playerShirtNrInput.value = '';
+                playerDobInput.value = '';
+                playerAgeSpan.textContent = '';
+                if (!activePlayerId) {
+                    playerDetailsSection.style.display = 'none';
+                }
             };
 
             // --- Event Handlers ---
@@ -423,6 +509,9 @@
                 const newPlayer = {
                     id: `player_${Date.now()}`,
                     name: name,
+                    position: '',
+                    shirtNumber: '',
+                    dob: '',
                     data: generateNewLogData()
                 };
                 players.push(newPlayer);
@@ -440,7 +529,6 @@
                 }
                 const playerIndex = players.findIndex(p => p.id === activePlayerId);
                 if (playerIndex > -1) {
-                    // Use a more robust confirmation dialog
                     const modalConfirm = confirm(`Are you sure you want to delete player: ${players[playerIndex].name}? This cannot be undone.`);
                     if (modalConfirm) {
                         const playerName = players[playerIndex].name;
@@ -460,7 +548,8 @@
                 } else {
                     clearForm();
                 }
-                saveData(); // Save the new active player selection
+                updatePlayerDropdown(); // To show/hide details section
+                saveData();
             };
 
             const handleFormInput = (e) => {
@@ -468,9 +557,25 @@
                 
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
+                
+                // Handle player detail inputs separately
+                if(e.target.classList.contains('player-detail-input')) {
+                    if (e.target.id === 'log-date') player.data.logDate = e.target.value;
+                    if (e.target.id === 'player-position') player.position = e.target.value;
+                    if (e.target.id === 'player-shirt-nr') {
+                        player.shirtNumber = e.target.value;
+                        updatePlayerDropdown(); // Update dropdown text live
+                    }
+                    if(e.target.id === 'player-dob'){
+                        player.dob = e.target.value;
+                        playerAgeSpan.textContent = calculateAge(player.dob);
+                    }
+                    saveData();
+                    return;
+                }
 
                 const dataId = e.target.dataset.id;
-                const subtype = e.target.subtype;
+                const subtype = e.target.dataset.subtype;
 
                 if (subtype) { // Mental skills input
                     if (!player.data.mentalSkills) player.data.mentalSkills = {};
@@ -482,15 +587,15 @@
                     } else {
                         player.data.mentalSkills[dataId][subtype] = e.target.value;
                     }
-                } else if (e.target.dataset.type === 'comment') { // Standard comment
-                    if (!player.data['analyst-comments']) {
-                        player.data['analyst-comments'] = {};
+                } else if (e.target.dataset.type === 'comment') {
+                    if (!player.data.comments) {
+                        player.data.comments = {};
                     }
-                    player.data['analyst-comments'][dataId] = e.target.value;
-                } else { // Standard select
+                    player.data.comments[dataId] = e.target.value;
+                } else {
                     player.data[dataId] = e.target.value;
                 }
-                saveData(); // Save on every input change
+                saveData();
             };
 
             const handleAddSession = () => {
@@ -509,23 +614,45 @@
                     return;
                 }
 
-                // 1. Update the log structure definition
-                mentalSkillsSection.params.push({ id: sessionId, label: sessionName });
+                mentalSkillsSection.params.push({ id: sessionId, label: sessionName, isCustom: true });
                 
-                // 2. Update all existing players to include a data entry for this new session
                 players.forEach(player => {
-                    if (!player.data.mentalSkills) {
-                        player.data.mentalSkills = {};
-                    }
+                    if (!player.data.mentalSkills) player.data.mentalSkills = {};
                     player.data.mentalSkills[sessionId] = { checked: false, score: '', comment: '' };
                 });
 
-                // 3. Re-render the form and save everything
                 newSessionInput.value = '';
                 renderLogForm();
                 populateForm(activePlayerId);
                 saveData();
                 showToast(`Session "${sessionName}" added.`);
+            };
+            
+            const handleDeleteSession = (sessionId) => {
+                if (!sessionId) return;
+                
+                const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
+                const sessionIndex = mentalSkillsSection.params.findIndex(p => p.id === sessionId);
+                
+                if (sessionIndex > -1) {
+                    const sessionName = mentalSkillsSection.params[sessionIndex].label;
+                    if(confirm(`Are you sure you want to permanently delete the session "${sessionName}" for all players?`)){
+                        // Remove from structure
+                        mentalSkillsSection.params.splice(sessionIndex, 1);
+
+                        // Remove from all players' data
+                        players.forEach(player => {
+                            if (player.data.mentalSkills && player.data.mentalSkills[sessionId]) {
+                                delete player.data.mentalSkills[sessionId];
+                            }
+                        });
+
+                        renderLogForm();
+                        populateForm(activePlayerId);
+                        saveData();
+                        showToast(`Session "${sessionName}" deleted.`);
+                    }
+                }
             };
 
             const handleExport = () => {
@@ -538,7 +665,7 @@
 
                 const exportData = {
                     player: player,
-                    structure: logStructure // Export the structure as well
+                    structure: logStructure
                 };
 
                 const dataStr = JSON.stringify(exportData, null, 2);
@@ -554,6 +681,51 @@
                 showToast(`Data for "${player.name}" exported.`);
             };
 
+            const handleSaveAsPdf = () => {
+                if (!activePlayerId) {
+                    showToast("Please select a player to generate a PDF.");
+                    return;
+                }
+                showToast("Generating PDF... Please wait.");
+                const player = players.find(p => p.id === activePlayerId);
+                
+                // Temporarily make all elements visible for capture
+                const { jsPDF } = window.jspdf;
+                const contentToCapture = document.getElementById('pdf-content');
+                const mainContentToCapture = document.getElementById('log-form');
+
+                html2canvas(mainContentToCapture, { backgroundColor: '#111827', scale: 2 }).then(mainCanvas => {
+                    html2canvas(contentToCapture, { backgroundColor: '#1f2937', scale: 2 }).then(headerCanvas => {
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        
+                        // Add header
+                        const headerImgData = headerCanvas.toDataURL('image/png');
+                        const headerImgProps = pdf.getImageProperties(headerImgData);
+                        const headerPdfWidth = pageWidth - 20; // with margin
+                        const headerPdfHeight = (headerImgProps.height * headerPdfWidth) / headerImgProps.width;
+                        pdf.addImage(headerImgData, 'PNG', 10, 10, headerPdfWidth, headerPdfHeight);
+
+                        // Add main content
+                        const mainImgData = mainCanvas.toDataURL('image/png');
+                        const mainImgProps = pdf.getImageProperties(mainImgData);
+                        const mainPdfWidth = pageWidth - 20; // with margin
+                        const mainPdfHeight = (mainImgProps.height * mainPdfWidth) / mainImgProps.width;
+
+                        let currentHeight = headerPdfHeight + 20;
+                        if (currentHeight + mainPdfHeight < pageHeight) {
+                            pdf.addImage(mainImgData, 'PNG', 10, currentHeight, mainPdfWidth, mainPdfHeight);
+                        } else {
+                            pdf.addPage();
+                            pdf.addImage(mainImgData, 'PNG', 10, 10, mainPdfWidth, mainPdfHeight);
+                        }
+                        
+                        pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
+                    });
+                });
+            };
+
             const handleImport = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -562,22 +734,20 @@
                 reader.onload = (event) => {
                     try {
                         const importedData = JSON.parse(event.target.result);
-                        // Backwards compatibility for old format
-                        const importedPlayer = importedData.player ? importedData.player : importedData;
+                        const importedPlayer = importedData.player || importedData;
                         const importedStructure = importedData.structure;
 
                         if (!importedPlayer.id || !importedPlayer.name || !importedPlayer.data) {
                            throw new Error("Invalid file format.");
                         }
 
-                        // If the imported file has a structure, merge it
                         if (importedStructure) {
                             const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
                             const importedMentalSkills = importedStructure.find(s => s.type === 'mental_skills');
                             
                             if (importedMentalSkills) {
                                 importedMentalSkills.params.forEach(importedParam => {
-                                    if (!mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
+                                    if (importedParam.isCustom && !mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
                                         mentalSkillsSection.params.push(importedParam);
                                     }
                                 });
@@ -595,7 +765,6 @@
                         }
                         activePlayerId = importedPlayer.id;
                         
-                        // Full re-render and save
                         renderLogForm();
                         updateAndSave();
 
@@ -609,12 +778,18 @@
             };
 
             const handleReset = () => {
-                playerSelect.value = "";
-                activePlayerId = null;
-                playerNameInput.value = "";
-                clearForm();
-                saveData();
-                showToast("Form cleared for new player.");
+                if(activePlayerId){
+                    const player = players.find(p => p.id === activePlayerId);
+                    if(confirm(`Are you sure you want to clear all data for ${player.name}? This will reset all fields.`)){
+                        player.data = generateNewLogData();
+                        populateForm(activePlayerId);
+                        saveData();
+                        showToast(`Form for ${player.name} has been cleared.`);
+                    }
+                } else {
+                    clearForm();
+                    showToast("Form cleared.");
+                }
             };
             
             // --- Initialization ---
@@ -635,19 +810,27 @@
                 updatePlayerDropdown();
                 if(activePlayerId && players.some(p=>p.id === activePlayerId)) {
                     playerSelect.value = activePlayerId;
-                    populateForm(activePlayerId);
                 } else if (players.length > 0) {
                     activePlayerId = players[0].id;
                     playerSelect.value = activePlayerId;
+                } else {
+                    activePlayerId = null;
+                }
+                
+                if (activePlayerId) {
                     populateForm(activePlayerId);
+                } else {
+                    clearForm();
                 }
 
                 // Attach Event Listeners
                 addPlayerBtn.addEventListener('click', handleAddPlayer);
                 deletePlayerBtn.addEventListener('click', handleDeletePlayer);
                 playerSelect.addEventListener('change', handlePlayerSelect);
-                logFormContainer.addEventListener('input', handleFormInput);
+                document.getElementById('dynamics-form').addEventListener('input', handleFormInput);
+                document.getElementById('player-details-section').addEventListener('input', handleFormInput);
                 exportBtn.addEventListener('click', handleExport);
+                pdfBtn.addEventListener('click', handleSaveAsPdf);
                 importFile.addEventListener('change', handleImport);
                 resetBtn.addEventListener('click', handleReset);
                 
