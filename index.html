@@ -85,47 +85,47 @@
             transform: translate(-50%, -50%);
             font-size: 1rem;
         }
+        /* DEBUG FIX: Add a class to hide elements only during PDF generation */
+        .hide-for-pdf {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="h-full text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
     <div id="app" class="max-w-7xl mx-auto flex flex-col h-full">
-        <!-- Header Section -->
         <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h1 class="text-2xl font-bold text-teal-400">Holistic Dynamics Log</h1>
-                <!-- Player Selection -->
                 <div class="flex flex-wrap items-center gap-2">
                     <select id="player-select" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full md:w-auto"></select>
                 </div>
             </div>
             
             <div id="pdf-content">
-                <!-- Player Details Section -->
-                 <div id="player-details-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4 border-t border-gray-700 pt-4">
-                    <div>
-                        <label for="log-date" class="block text-sm font-medium text-gray-400">Date</label>
-                        <input type="date" id="log-date" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
+                <div id="player-details-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4 border-t border-gray-700 pt-4">
                      <div>
-                        <label for="player-dob" class="block text-sm font-medium text-gray-400">D.O.B.</label>
-                        <input type="date" id="player-dob" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400">Age</label>
-                        <span id="player-age" class="mt-1 flex items-center bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white w-full h-10"></span>
-                    </div>
-                    <div>
-                        <label for="player-position" class="block text-sm font-medium text-gray-400">Position</label>
-                        <input type="text" id="player-position" placeholder="e.g., Forward" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
+                         <label for="log-date" class="block text-sm font-medium text-gray-400">Date</label>
+                         <input type="date" id="log-date" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                     </div>
+                      <div>
+                         <label for="player-dob" class="block text-sm font-medium text-gray-400">D.O.B.</label>
+                         <input type="date" id="player-dob" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                     </div>
                      <div>
-                        <label for="player-shirt-nr" class="block text-sm font-medium text-gray-400">Shirt Nr.</label>
-                        <input type="number" id="player-shirt-nr" placeholder="e.g., 10" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
-                </div>
+                         <label class="block text-sm font-medium text-gray-400">Age</label>
+                         <span id="player-age" class="mt-1 flex items-center bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white w-full h-10"></span>
+                     </div>
+                     <div>
+                         <label for="player-position" class="block text-sm font-medium text-gray-400">Position</label>
+                         <input type="text" id="player-position" placeholder="e.g., Forward" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                     </div>
+                      <div>
+                         <label for="player-shirt-nr" class="block text-sm font-medium text-gray-400">Shirt Nr.</label>
+                         <input type="number" id="player-shirt-nr" placeholder="e.g., 10" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                     </div>
+                 </div>
             </div>
 
-            <!-- Add Player Section -->
             <div class="flex flex-col sm:flex-row items-end gap-2 mt-4 border-t border-gray-700 pt-4">
                  <div class="flex-grow">
                      <label for="player-name-input" class="block text-sm font-medium text-gray-400">New Player Name</label>
@@ -135,8 +135,7 @@
                  <button id="delete-player-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Delete Active Player</button>
             </div>
 
-             <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-2 mt-4 border-t border-gray-700 pt-4">
+             <div class="flex flex-wrap gap-2 mt-4 border-t border-gray-700 pt-4">
                 <button id="reset-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Clear Form</button>
                 <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Export JSON</button>
                 <label for="import-file" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 cursor-pointer flex-1 sm:flex-grow-0 text-center">Import JSON</label>
@@ -145,14 +144,11 @@
             </div>
         </header>
 
-        <!-- Main Content: Log Form -->
         <main class="flex-grow bg-gray-800 rounded-lg p-4 overflow-y-auto shadow-inner" id="log-form">
             <form id="dynamics-form" onsubmit="return false;">
-                <!-- Log Sections will be dynamically inserted here -->
-            </form>
+                </form>
         </main>
         
-        <!-- Toast Notification -->
         <div id="toast" class="toast"></div>
 
     </div>
@@ -220,10 +216,10 @@
                     title: "SECTION 4: MATCH DAY PRESSURE RESPONSE (Optional)",
                     description: "This optional section assesses how the athlete handles the unique stress of competition.",
                     params: [
-                         { id: 'preCompState', label: 'Pre-Competition State', options: ['Optimal Fighter', 'Anxious/Hyper-activated', 'Apathetic/Withdrawn'] },
-                         { id: 'pressureResponse', label: 'Response to High-Pressure', options: ['Thrives', 'Copes', 'Hides/Panics'] },
-                         { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] },
-                         { id: 'postMatchReaction', label: 'Post-Match Reaction', options: ['Balanced', 'Highly Emotional', 'Destructive/Blaming'] }
+                          { id: 'preCompState', label: 'Pre-Competition State', options: ['Optimal Fighter', 'Anxious/Hyper-activated', 'Apathetic/Withdrawn'] },
+                          { id: 'pressureResponse', label: 'Response to High-Pressure', options: ['Thrives', 'Copes', 'Hides/Panics'] },
+                          { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] },
+                          { id: 'postMatchReaction', label: 'Post-Match Reaction', options: ['Balanced', 'Highly Emotional', 'Destructive/Blaming'] }
                     ]
                 },
                 {
@@ -382,7 +378,6 @@
                                         `).join('')}
                                     </tbody>
                                 </table>
-                                <!-- ADD NEW SESSION UI -->
                                 <div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2">
                                     <input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
                                     <button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button>
@@ -428,16 +423,15 @@
             };
 
             const updatePlayerDropdown = () => {
+                const selectedVal = playerSelect.value;
                 playerSelect.innerHTML = '<option value="">-- Select a Player --</option>';
                 players.forEach(p => {
                     const option = document.createElement('option');
                     option.value = p.id;
                     option.textContent = `${p.name} ${p.shirtNumber ? `(#${p.shirtNumber})` : ''}`;
-                    if (p.id === activePlayerId) {
-                        option.selected = true;
-                    }
                     playerSelect.appendChild(option);
                 });
+                playerSelect.value = selectedVal;
                 playerDetailsSection.style.display = activePlayerId ? 'grid' : 'none';
             };
 
@@ -533,7 +527,7 @@
                     if (modalConfirm) {
                         const playerName = players[playerIndex].name;
                         players.splice(playerIndex, 1);
-                        activePlayerId = players.length > 0 ? players[0].id : null;
+                        activePlayerId = players.length > 0 ? players[Math.max(0, playerIndex - 1)].id : null;
                         
                         updateAndSave();
                         showToast(`Player "${playerName}" deleted.`);
@@ -681,49 +675,100 @@
                 showToast(`Data for "${player.name}" exported.`);
             };
 
-            const handleSaveAsPdf = () => {
+            const handleSaveAsPdf = async () => {
                 if (!activePlayerId) {
                     showToast("Please select a player to generate a PDF.");
                     return;
                 }
                 showToast("Generating PDF... Please wait.");
                 const player = players.find(p => p.id === activePlayerId);
-                
-                // Temporarily make all elements visible for capture
                 const { jsPDF } = window.jspdf;
+
+                // DEBUG FIX: Temporarily replace inputs with static text for reliable PDF rendering.
+                const inputsToReplace = document.querySelectorAll('.player-detail-input, .log-input');
+                const originalValues = new Map();
+
+                inputsToReplace.forEach(input => {
+                    const parent = input.parentElement;
+                    const replacement = document.createElement('span');
+                    replacement.className = 'text-white px-3 py-2'; // Match styling
+                    let value = '';
+
+                    if (input.type === 'checkbox') {
+                        value = input.checked ? '✔ Yes' : 'No';
+                    } else if (input.tagName === 'TEXTAREA') {
+                        value = input.value.replace(/\n/g, '<br>');
+                        replacement.innerHTML = value || '-';
+                        replacement.style.whiteSpace = 'pre-wrap';
+                    } else {
+                        value = input.value || '-';
+                    }
+
+                    if (input.tagName !== 'TEXTAREA') {
+                       replacement.textContent = value;
+                    }
+                    
+                    originalValues.set(input, { parent, replacement });
+                    parent.insertBefore(replacement, input);
+                    input.classList.add('hide-for-pdf');
+                });
+                // END DEBUG FIX
+
                 const contentToCapture = document.getElementById('pdf-content');
                 const mainContentToCapture = document.getElementById('log-form');
 
-                html2canvas(mainContentToCapture, { backgroundColor: '#111827', scale: 2 }).then(mainCanvas => {
-                    html2canvas(contentToCapture, { backgroundColor: '#1f2937', scale: 2 }).then(headerCanvas => {
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const pageHeight = pdf.internal.pageSize.getHeight();
-                        
-                        // Add header
-                        const headerImgData = headerCanvas.toDataURL('image/png');
-                        const headerImgProps = pdf.getImageProperties(headerImgData);
-                        const headerPdfWidth = pageWidth - 20; // with margin
-                        const headerPdfHeight = (headerImgProps.height * headerPdfWidth) / headerImgProps.width;
-                        pdf.addImage(headerImgData, 'PNG', 10, 10, headerPdfWidth, headerPdfHeight);
+                try {
+                    const mainCanvas = await html2canvas(mainContentToCapture, { backgroundColor: '#111827', scale: 2 });
+                    const headerCanvas = await html2canvas(contentToCapture, { backgroundColor: '#1f2937', scale: 2 });
+                    
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const pageMargin = 10;
+                    
+                    const headerImgData = headerCanvas.toDataURL('image/png');
+                    const headerImgProps = pdf.getImageProperties(headerImgData);
+                    const headerPdfWidth = pageWidth - (pageMargin * 2);
+                    const headerPdfHeight = (headerImgProps.height * headerPdfWidth) / headerImgProps.width;
+                    pdf.addImage(headerImgData, 'PNG', pageMargin, pageMargin, headerPdfWidth, headerPdfHeight);
 
-                        // Add main content
-                        const mainImgData = mainCanvas.toDataURL('image/png');
-                        const mainImgProps = pdf.getImageProperties(mainImgData);
-                        const mainPdfWidth = pageWidth - 20; // with margin
-                        const mainPdfHeight = (mainImgProps.height * mainPdfWidth) / mainImgProps.width;
+                    const mainImgData = mainCanvas.toDataURL('image/png');
+                    const mainImgProps = pdf.getImageProperties(mainImgData);
+                    const mainPdfWidth = pageWidth - (pageMargin * 2);
+                    let mainPdfHeight = (mainImgProps.height * mainPdfWidth) / mainImgProps.width;
 
-                        let currentHeight = headerPdfHeight + 20;
-                        if (currentHeight + mainPdfHeight < pageHeight) {
-                            pdf.addImage(mainImgData, 'PNG', 10, currentHeight, mainPdfWidth, mainPdfHeight);
-                        } else {
-                            pdf.addPage();
-                            pdf.addImage(mainImgData, 'PNG', 10, 10, mainPdfWidth, mainPdfHeight);
+                    let heightLeft = mainPdfHeight;
+                    let position = headerPdfHeight + pageMargin + 5; 
+
+                    if (position + heightLeft < pageHeight) {
+                         pdf.addImage(mainImgData, 'PNG', pageMargin, position, mainPdfWidth, mainPdfHeight);
+                    } else {
+                        // Handle content that spans multiple pages
+                        while (heightLeft > 0) {
+                            if (position > headerPdfHeight + 5) { // Check if it's not the first page of main content
+                                pdf.addPage();
+                                position = pageMargin;
+                            }
+                            const pageCutHeight = (pageHeight - position - pageMargin) * (mainCanvas.height / mainPdfHeight);
+                            pdf.addImage(mainImgData, 'PNG', pageMargin, position, mainPdfWidth, pageHeight - position - pageMargin, '', 'FAST', 0, 0, mainCanvas.width, pageCutHeight);
+                            heightLeft -= (pageHeight - position - pageMargin);
+                            position = 0; // Reset position for subsequent pages
                         }
-                        
-                        pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
-                    });
-                });
+                    }
+
+                    pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
+                } catch(err) {
+                    console.error("PDF Generation failed", err);
+                    showToast("Error creating PDF. See console for details.")
+                } finally {
+                     // DEBUG FIX: Restore original input elements after PDF generation
+                     inputsToReplace.forEach(input => {
+                         const { parent, replacement } = originalValues.get(input);
+                         parent.removeChild(replacement);
+                         input.classList.remove('hide-for-pdf');
+                     });
+                     // END DEBUG FIX
+                }
             };
 
             const handleImport = (e) => {
