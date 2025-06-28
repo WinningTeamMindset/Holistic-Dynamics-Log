@@ -183,24 +183,22 @@
                     ]
                 },
                 {
-                    title: "SECTION 5: MENTAL SKILLS & SESSIONS LIST",
-                    description: "Track and score the implementation of key mental skills and intervention techniques.",
+                    title: "SECTION 5: MENTAL SKILLS & SESSIONS TO DO LIST",
+                    description: "Track and score the implementation of key mental skills and intervention sessions.",
                     type: 'mental_skills', // Special type for custom rendering
                     params: [
-                        { id: 'initialSession', label: 'Initial Session' },
                         { id: 'selfTalk', label: 'Positive Self Talk' },
-                        { id: 'imageanchoring', label: 'Image Anchoring' },
+                        { id: 'negativeSelfTalk', label: 'Negative Self Talk' },
                         { id: 'emotionalAnchor', label: 'Emotional Anchor' },
                         { id: 'emotionalControl', label: 'Emotional Control' },
                         { id: 'visualisation', label: 'Visualisation' },
                         { id: 'goalSetting', label: 'Goal Setting' },
-                        { id: 'anxietyControl', label: 'Anxiety Control' },
                         { id: 'stressControl', label: 'Stress Control' },
                         { id: 'selfAwareness', label: 'Self Awareness' },
                         { id: 'strengthCorrections', label: 'Strength & Corrections' },
-                        { id: 'pre-during-afterGameRoutine', label: 'Pre-During-After Game Routine' },
                         { id: 'breathing', label: 'Breathing Techniques' },
                         { id: 'focus', label: 'How to Focus' },
+                        { id: 'individualSessions', label: 'Individual Sessions' },
                         { id: 'crisisTalks', label: 'Crisis Talks' },
                         { id: 'newBehavior', label: 'New Behavior Pattern' },
                         { id: 'patternInterrupt', label: 'Pattern Interrupt' }
@@ -297,8 +295,8 @@
                                 <table class="min-w-full divide-y divide-gray-700">
                                     <thead class="bg-gray-700/50">
                                         <tr>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Sessions</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider text-center">Re-Do</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Session</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider text-center">Done</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Score (1-10)</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th>
                                         </tr>
@@ -325,8 +323,8 @@
                                 </table>
                                 <!-- ADD NEW SESSION UI -->
                                 <div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2">
-                                    <input id="new-skill-input" type="text" placeholder="Add Session..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
-                                    <button id="add-skill-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Technique</button>
+                                    <input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
+                                    <button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button>
                                 </div>
                                 `;
                     } else {
@@ -336,7 +334,7 @@
                                         <tr>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th>
                                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Analyst Comments</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -361,7 +359,7 @@
                 });
                 logFormContainer.innerHTML = html;
                 // Need to re-attach listener for the new button after re-render
-                document.getElementById('add-skill-btn')?.addEventListener('click', handleAddSkill);
+                document.getElementById('add-session-btn')?.addEventListener('click', handleAddSession);
             };
 
             const updatePlayerDropdown = () => {
@@ -495,39 +493,39 @@
                 saveData(); // Save on every input change
             };
 
-            const handleAddSkill = () => {
-                const newSkillInput = document.getElementById('new-skill-input');
-                const skillName = newSkillInput.value.trim();
-                if (!skillName) {
-                    showToast("Please enter a name for the new technique.");
+            const handleAddSession = () => {
+                const newSessionInput = document.getElementById('new-session-input');
+                const sessionName = newSessionInput.value.trim();
+                if (!sessionName) {
+                    showToast("Please enter a name for the new session.");
                     return;
                 }
 
-                const skillId = skillName.toLowerCase().replace(/\s+/g, '_') + `_${Date.now()}`;
+                const sessionId = sessionName.toLowerCase().replace(/\s+/g, '_') + `_${Date.now()}`;
                 
                 const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
-                if (mentalSkillsSection.params.some(p => p.label.toLowerCase() === skillName.toLowerCase())) {
-                    showToast("This technique already exists.");
+                if (mentalSkillsSection.params.some(p => p.label.toLowerCase() === sessionName.toLowerCase())) {
+                    showToast("This session already exists.");
                     return;
                 }
 
                 // 1. Update the log structure definition
-                mentalSkillsSection.params.push({ id: skillId, label: skillName });
+                mentalSkillsSection.params.push({ id: sessionId, label: sessionName });
                 
-                // 2. Update all existing players to include a data entry for this new skill
+                // 2. Update all existing players to include a data entry for this new session
                 players.forEach(player => {
                     if (!player.data.mentalSkills) {
                         player.data.mentalSkills = {};
                     }
-                    player.data.mentalSkills[skillId] = { checked: false, score: '', comment: '' };
+                    player.data.mentalSkills[sessionId] = { checked: false, score: '', comment: '' };
                 });
 
                 // 3. Re-render the form and save everything
-                newSkillInput.value = '';
+                newSessionInput.value = '';
                 renderLogForm();
                 populateForm(activePlayerId);
                 saveData();
-                showToast(`Technique "${skillName}" added.`);
+                showToast(`Session "${sessionName}" added.`);
             };
 
             const handleExport = () => {
@@ -577,11 +575,13 @@
                             const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
                             const importedMentalSkills = importedStructure.find(s => s.type === 'mental_skills');
                             
-                            importedMentalSkills.params.forEach(importedParam => {
-                                if (!mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
-                                    mentalSkillsSection.params.push(importedParam);
-                                }
-                            });
+                            if (importedMentalSkills) {
+                                importedMentalSkills.params.forEach(importedParam => {
+                                    if (!mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
+                                        mentalSkillsSection.params.push(importedParam);
+                                    }
+                                });
+                            }
                         }
                         
                         const existingPlayerIndex = players.findIndex(p => p.id === importedPlayer.id || p.name.toLowerCase() === importedPlayer.name.toLowerCase());
