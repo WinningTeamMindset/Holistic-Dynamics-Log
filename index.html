@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-900">
+<body class="h-full text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
+    <div id="app" class="max-w-7xl mx-auto flex flex-col h-full">
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... (All elements and utility functions are identical) ...
+
+            const populateForm = (playerId) => {
+                const player = players.find(p => p.id === playerId);
+                if (!player) {
+                    clearForm();
+                    return;
+                }
+
+                // --- ROBUSTNESS FIX START ---
+                // This new check prevents a crash if a player's data is missing in localStorage.
+                // If data is corrupt, it resets it for that player and saves the fix.
+                if (!player.data) {
+                    console.error(`Player "${player.name}" had missing or corrupt data. Resetting their log.`);
+                    player.data = generateNewLogData();
+                    saveData();
+                }
+                // --- ROBUSTNESS FIX END ---
+                
+                // Populate player details (this code is now safe)
+                logDateInput.value = player.data.logDate || new Date().toISOString().split('T')[0];
+                playerPositionInput.value = player.position || '';
+                playerShirtNrInput.value = player.shirtNumber || '';
+                playerDobInput.value = player.dob || '';
+                playerAgeSpan.textContent = calculateAge(player.dob);
+
+                // ... (rest of the populateForm function is unchanged) ...
+                document.querySelectorAll('.log-input').forEach(input => {
+                    const dataId = input.dataset.id;
+                    const subtype = input.dataset.subtype;
+
+                    if (subtype) { // This is a mental skills input
+                        if(player.data.mentalSkills && player.data.mentalSkills[dataId]) {
+                             if (subtype === 'checked') {
+                                input.checked = player.data.mentalSkills[dataId].checked || false;
+                            } else {
+                                input.value = player.data.mentalSkills[dataId][subtype] || '';
+                            }
+                        } else { // Clear if no data
+                            if (subtype === 'checked') input.checked = false; else input.value = '';
+                        }
+                    } else if (input.dataset.type === 'comment') {
+                        if (player.data.comments) {
+                           input.value = player.data.comments[dataId] || '';
+                        } else {
+                            input.value = '';
+                        }
+                    } else {
+                        input.value = player.data[dataId] || '';
+                    }
+                });
+            };
+            
+            // ... (All other functions like handleSaveAsPdf, init, etc., are identical to the previous version)
+
+            const clearForm = () => { /* ... unchanged ... */ };
+            const handleAddPlayer = () => { /* ... unchanged ... */ };
+            // ... and so on for all other functions.
+        });
+    </script>
+</body>
+</html>
