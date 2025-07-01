@@ -109,7 +109,6 @@
             let players = [];
             let activePlayerId = null;
 
-            // Final log structure with Foundational Readiness first
             const logStructure = [
                 {
                     title: "SECTION 1: FOUNDATIONAL READINESS",
@@ -156,13 +155,9 @@
                     ]
                 },
                 {
-                    title: "SECTION 5: SELF-ASSESSMENT INSIGHTS",
-                    description: "A summary of the player's own perception of their mental game. Use the comments box for detailed notes.",
-                    params: [
-                        { id: 'perceivedStrengths', label: 'Player\'s Perceived Strengths', options: [] },
-                        { id: 'perceivedWeaknesses', label: 'Player\'s Perceived Weaknesses', options: [] },
-                        { id: 'statedGoals', label: 'Player\'s Stated Goals', options: [] }
-                    ]
+                    title: "SECTION 5: STRENGTHS & CORRECTIONS ASSESSMENT",
+                    description: "A dual assessment identifying key strengths and areas for correction, from both the player's and coach's perspective.",
+                    type: 'assessment_grid' // New type for custom rendering
                 },
                 {
                     title: "SECTION 6: MENTAL SKILLS & ACTION PLAN",
@@ -199,11 +194,19 @@
 
             const generateNewLogData = () => {
                 const data = { logDate: new Date().toISOString().split('T')[0] };
+                data.assessmentGrid = {};
+                ['player_strength', 'player_correction', 'coach_strength', 'coach_correction'].forEach(type => {
+                    for (let i = 1; i <= 5; i++) {
+                        data.assessmentGrid[`${type}_${i}_text`] = '';
+                        data.assessmentGrid[`${type}_${i}_score`] = '';
+                    }
+                });
+
                 logStructure.forEach(section => {
                     if (section.type === 'mental_skills') {
                         data.mentalSkills = {};
                         section.params.forEach(param => { data.mentalSkills[param.id] = { checked: false, score: '', comment: '' }; });
-                    } else {
+                    } else if (section.type !== 'assessment_grid') {
                         if (!data['analyst-comments']) data['analyst-comments'] = {};
                         section.params.forEach(param => {
                             data[param.id] = '';
@@ -229,30 +232,7 @@
                 try {
                     const savedPlayers = localStorage.getItem('dynamicsLogPlayers');
                     const savedActivePlayer = localStorage.getItem('dynamicsLogActivePlayer');
-                    const savedStructure = localStorage.getItem('dynamicsLogStructure');
-                    if (savedStructure) {
-                        try {
-                           const loadedStructure = JSON.parse(savedStructure);
-                           if (Array.isArray(loadedStructure) && loadedStructure.length > 0) { 
-                               const defaultParamIds = new Set(logStructure.flatMap(s => s.params.map(p => p.id)));
-                               loadedStructure.forEach(loadedSection => {
-                                   const defaultSection = logStructure.find(s => s.title === loadedSection.title);
-                                   if (defaultSection) {
-                                       loadedSection.params = loadedSection.params.filter(p => defaultParamIds.has(p.id));
-                                       const loadedParamIds = new Set(loadedSection.params.map(p => p.id));
-                                       defaultSection.params.forEach(defaultParam => {
-                                           if (!loadedParamIds.has(defaultParam.id)) {
-                                               loadedSection.params.push(defaultParam);
-                                           }
-                                       });
-                                   }
-                               });
-                               Object.assign(logStructure, loadedStructure);
-                           }
-                        } catch (e) {
-                            console.error("Error parsing saved structure, using default.", e);
-                        }
-                    }
+                    // We don't load the structure anymore to ensure the code's structure is always used
                     if (savedPlayers) { players = JSON.parse(savedPlayers); }
                     if (savedActivePlayer) { activePlayerId = savedActivePlayer; }
                 } catch (e) {
@@ -263,11 +243,33 @@
 
             const renderLogForm = () => {
                 let html = '';
+                const scoreOptions = `<option value="">N/A</option>${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}`;
+
                 logStructure.forEach((section, index) => {
                     html += `<fieldset id="fieldset-section-${index}" class="mb-6 border-t-2 border-teal-500 pt-2"><legend class="text-xl font-semibold text-teal-400 mb-2 px-2">${section.title}</legend><p class="text-sm text-gray-400 mb-4 px-2">${section.description}</p><div class="table-container">`;
-                    if (section.type === 'mental_skills') {
+                    
+                    if (section.type === 'assessment_grid') {
+                        const createGrid = (type, title) => {
+                            let gridHtml = `<h3 class="text-lg font-medium text-gray-300 mt-4 mb-2 px-2">${title}</h3>`;
+                            gridHtml += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th class="w-12 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">${type.includes('strength') ? 'Strength' : 'Correction'}</th><th class="w-40 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Score (1-10)</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
+                            for (let i = 1; i <= 5; i++) {
+                                gridHtml += `<tr>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${i}</td>
+                                    <td class="px-4 py-4"><input type="text" data-id="${type}_${i}_text" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"></td>
+                                    <td class="px-4 py-4"><select data-id="${type}_${i}_score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">${scoreOptions}</select></td>
+                                </tr>`;
+                            }
+                            gridHtml += '</tbody></table>';
+                            return gridHtml;
+                        };
+                        html += createGrid('player_strength', "Player's Self-Assessment: 5 Strengths");
+                        html += createGrid('player_correction', "Player's Self-Assessment: 5 Corrections");
+                        html += createGrid('coach_strength', "Coach's Assessment: 5 Strengths");
+                        html += createGrid('coach_correction', "Coach's Assessment: 5 Corrections");
+
+                    } else if (section.type === 'mental_skills') {
                         html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Session</th><th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Re-Do</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Success Rate (1-10)</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
-                        section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap text-center"><input type="checkbox" data-id="${param.id}" data-subtype="checked" class="log-input custom-checkbox"></td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"><option value="">N/A</option>${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specifics..."></textarea></td></tr>`; });
+                        section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap text-center"><input type="checkbox" data-id="${param.id}" data-subtype="checked" class="log-input custom-checkbox"></td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">${scoreOptions}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specifics..."></textarea></td></tr>`; });
                         html += `</tbody></table><div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2 hide-on-print"><input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow"><button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button></div>`;
                     } else {
                         html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Analyst Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
@@ -297,9 +299,9 @@
                 if (!player) { clearForm(); return; }
                 const defaultData = generateNewLogData();
                 player.data = { ...defaultData, ...player.data };
+                player.data.assessmentGrid = { ...defaultData.assessmentGrid, ...player.data.assessmentGrid };
                 player.data.mentalSkills = { ...defaultData.mentalSkills, ...player.data.mentalSkills };
                 player.data['analyst-comments'] = { ...defaultData['analyst-comments'], ...player.data['analyst-comments'] };
-
 
                 playerDetailsSection.style.display = 'grid';
                 logDateInput.value = player.data.logDate || new Date().toISOString().split('T')[0];
@@ -307,20 +309,21 @@
                 playerAgeSpan.textContent = calculateAge(player.dob);
                 playerPositionInput.value = player.position || '';
                 playerShirtNrInput.value = player.shirtNumber || '';
+                
                 document.querySelectorAll('.log-input').forEach(input => {
                     const dataId = input.dataset.id;
                     const subtype = input.dataset.subtype;
-                    if (subtype) {
+
+                    if (player.data.assessmentGrid && dataId in player.data.assessmentGrid) {
+                        input.value = player.data.assessmentGrid[dataId] || '';
+                    } else if (subtype) { // Mental Skills
                         if (player.data.mentalSkills && player.data.mentalSkills[dataId]) {
                             if (subtype === 'checked') input.checked = player.data.mentalSkills[dataId].checked || false;
-                            else input.value = player.data.mentalSkills[dataId][subtype] || '';
-                        } else {
-                            if (subtype === 'checked') input.checked = false; else input.value = '';
+                            else input.value = player.data.mentalSkills[dataId].score || '';
                         }
-                    } else if (input.dataset.type === 'comment') {
+                    } else if (input.dataset.type === 'comment') { // Standard Analyst Comments
                         if (player.data['analyst-comments']) input.value = player.data['analyst-comments'][dataId] || '';
-                        else input.value = '';
-                    } else {
+                    } else { // Standard Select
                         input.value = player.data[dataId] || '';
                     }
                 });
@@ -374,21 +377,25 @@
                 if (!activePlayerId) return;
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
+                
+                const dataId = e.target.dataset.id;
+
                 if (e.target.classList.contains('player-detail-input')) {
                     const id = e.target.id;
                     if (id === 'log-date') player.data.logDate = e.target.value;
                     else if (id === 'player-dob') { player.dob = e.target.value; playerAgeSpan.textContent = calculateAge(player.dob); }
                     else if (id === 'player-position') player.position = e.target.value;
                     else if (id === 'player-shirt-nr') { player.shirtNumber = e.target.value; updatePlayerDropdown(); }
+                } else if (player.data.assessmentGrid && dataId in player.data.assessmentGrid) {
+                    player.data.assessmentGrid[dataId] = e.target.value;
                 } else {
-                    const dataId = e.target.dataset.id;
                     const subtype = e.target.dataset.subtype;
                     if (subtype) {
-                        if (!player.data.mentalSkills) player.data.mentalSkills = {};
                         if (!player.data.mentalSkills[dataId]) player.data.mentalSkills[dataId] = { checked: false, score: '', comment: '' };
-                        player.data.mentalSkills[dataId][subtype] = (subtype === 'checked') ? e.target.checked : e.target.value;
+                        if(subtype === 'checked') player.data.mentalSkills[dataId].checked = e.target.checked;
+                        if(subtype === 'score') player.data.mentalSkills[dataId].score = e.target.value;
+                        if(subtype === 'comment') player.data.mentalSkills[dataId].comment = e.target.value;
                     } else if (e.target.dataset.type === 'comment') {
-                        if (!player.data['analyst-comments']) player.data['analyst-comments'] = {};
                         player.data['analyst-comments'][dataId] = e.target.value;
                     } else {
                         player.data[dataId] = e.target.value;
@@ -420,7 +427,7 @@
                 if (!activePlayerId) { showToast("Please select a player to export."); return; }
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
-                const exportData = { player: player, structure: logStructure };
+                const exportData = { player: player };
                 const dataStr = JSON.stringify(exportData, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -437,22 +444,13 @@
                     try {
                         const importedData = JSON.parse(event.target.result);
                         const importedPlayer = importedData.player || importedData;
-                        const importedStructure = importedData.structure;
                         if (!importedPlayer.id || !importedPlayer.name || !importedPlayer.data) { throw new Error("Invalid file format."); }
-                        if (importedStructure) {
-                            const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
-                            const importedMentalSkills = importedStructure.find(s => s.type === 'mental_skills');
-                            if (importedMentalSkills) {
-                                importedMentalSkills.params.forEach(importedParam => {
-                                    if (!mentalSkillsSection.params.some(p => p.id === importedParam.id)) { mentalSkillsSection.params.push(importedParam); }
-                                });
-                            }
-                        }
+                        
                         const existingPlayerIndex = players.findIndex(p => p.id === importedPlayer.id || p.name.toLowerCase() === importedPlayer.name.toLowerCase());
                         if (existingPlayerIndex > -1) { players[existingPlayerIndex] = importedPlayer; showToast(`Player "${importedPlayer.name}" data updated.`); } 
                         else { players.push(importedPlayer); showToast(`Player "${importedPlayer.name}" imported.`); }
                         activePlayerId = importedPlayer.id;
-                        renderLogForm(); updateAndSave();
+                        updateAndSave();
                     } catch (err) { console.error("Import failed:", err); showToast("Import failed. Please select a valid file."); }
                     e.target.value = null;
                 };
@@ -509,7 +507,6 @@
                 pdf.setDrawColor('#e0e0e0');
                 pdf.line(pageMargin, currentY - 5, contentWidth + pageMargin, currentY - 5);
 
-
                 const allSections = document.querySelectorAll('#dynamics-form fieldset');
                 for (const section of allSections) {
                     await addElementToPdf(section);
@@ -524,8 +521,7 @@
                 playerSelect.value = ""; activePlayerId = null;
                 playerNameInput.value = "";
                 clearForm();
-                updatePlayerDropdown();
-                saveData();
+                updateAndSave();
                 showToast("Form cleared for new player.");
             };
             
@@ -539,23 +535,8 @@
             function init() {
                 loadData();
                 renderLogForm();
-                updatePlayerDropdown();
-
-                if (activePlayerId && players.some(p => p.id === activePlayerId)) {
-                    playerSelect.value = activePlayerId;
-                } else if (players.length > 0) {
-                    activePlayerId = players[0].id;
-                    playerSelect.value = activePlayerId;
-                } else {
-                    activePlayerId = null;
-                }
+                updateAndSave();
                 
-                if (activePlayerId) {
-                    populateForm(activePlayerId);
-                } else {
-                    clearForm();
-                }
-
                 addPlayerBtn.addEventListener('click', handleAddPlayer);
                 deletePlayerBtn.addEventListener('click', handleDeletePlayer);
                 playerSelect.addEventListener('change', handlePlayerSelect);
