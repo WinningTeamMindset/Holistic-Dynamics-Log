@@ -24,12 +24,24 @@
         .custom-checkbox { appearance: none; background-color: #374151; border: 1px solid #6b7280; border-radius: 4px; width: 1.5rem; height: 1.5rem; cursor: pointer; position: relative; display: inline-block; vertical-align: middle; }
         .custom-checkbox:checked { background-color: #14b8a6; border-color: #0d9488; }
         .custom-checkbox:checked::after { content: '✔'; position: absolute; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; }
-        .hide-for-pdf { display: none !important; }
+        
+        /* Styles for PDF Generation */
+        .pdf-prepare .hide-for-pdf { display: none !important; }
+        .pdf-prepare body { background-color: white !important; }
+        .pdf-prepare #app { max-width: 100% !important; }
+        .pdf-prepare .bg-gray-900, .pdf-prepare .bg-gray-800 { background-color: white !important; }
+        .pdf-prepare .text-gray-200, .pdf-prepare .text-gray-300, .pdf-prepare .text-gray-400, .pdf-prepare .text-white { color: black !important; }
+        .pdf-prepare .border-gray-600, .pdf-prepare .border-gray-700 { border-color: #e0e0e0 !important; }
+        .pdf-prepare .border-teal-500 { border-color: #14b8a6 !important; }
+        .pdf-prepare .text-teal-400 { color: #14b8a6 !important; }
+        .pdf-prepare header { box-shadow: none !important; }
+        .pdf-prepare fieldset { page-break-inside: avoid; }
+
     </style>
 </head>
 <body class="text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
     <div id="app" class="max-w-7xl mx-auto flex flex-col">
-        <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg">
+        <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg hide-for-pdf">
             <h1 class="text-2xl font-bold text-teal-400 mb-4 text-center sm:text-left">Holistic Dynamics Log</h1>
             <div id="player-details-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4 border-t border-gray-700 pt-4" style="display: none;">
                 <div>
@@ -97,41 +109,53 @@
             let players = [];
             let activePlayerId = null;
 
-            // Merged and re-ordered log structure based on the "Fiche"
             const logStructure = [
                 {
-                    title: "SECTION 1: INTERNAL REPRESENTATIONAL & MINDSET",
-                    description: "Defines the player's core mental operating system: how they learn, process information, and what drives their behavior.",
+                    title: "SECTION 1: FOUNDATIONAL READINESS",
+                    description: "This section is the foundation. It tells you if the athlete is physically and mentally prepared to train effectively before they even start.",
                     params: [
-                        { id: 'repSystem', label: 'Primary Representational System', options: ['Visual (Learns by seeing)', 'Auditory (Learns by hearing)', 'Kinesthetic (Learns by doing)'] },
-                        { id: 'infoProcessing', label: 'Information Processing Style', options: ["Global (The 'Why')", "Detail (The 'How')"] },
-                        { id: 'motivation', label: 'Primary Motivational Driver', options: ['Towards Pleasure', 'Away From Pain'] },
-                        { id: 'validation', label: 'Source of Validation', options: ['Internal', 'External'] },
-                        { id: 'change', label: 'Response to Change & Novelty', options: ['Prefers Sameness', 'Energized by Difference'] }
+                        { id: 'sleep', label: 'Athlete-Reported Sleep', options: ['Optimal (8+ hrs)', 'Sufficient (7-8 hrs)', 'Compromised (<7 hrs)'] },
+                        { id: 'readiness', label: 'Physiological Readiness', options: ['High', 'Moderate', 'Low'] },
+                        { id: 'punctuality', label: 'Morning Punctuality', options: ['Proactive', 'Standard', 'Reactive'] },
+                        { id: 'protocols', label: 'Adherence to Protocols', options: ['Diligent', 'Compliant', 'Avoidant'] }
                     ]
                 },
                 {
-                    title: "SECTION 2: BEHAVIORAL & SOCIAL PROFILE",
-                    description: "Observes the player's default social roles and communication patterns within the team environment.",
+                    title: "SECTION 2: PSYCHOLOGICAL & BEHAVIORAL PROFILE",
+                    description: "This is the athlete’s 'Operating System.' It reveals their default tendencies, social roles, and communication styles.",
                     params: [
+                        { id: 'repSystem', label: 'Primary Representational System', options: ['Visual (Learns by seeing)', 'Auditory (Learns by hearing)', 'Kinesthetic (Learns by doing)'] },
+                        { id: 'motivation', label: 'Primary Motivational Driver', options: ['Towards Pleasure', 'Away From Pain'] },
+                        { id: 'validation', label: 'Source of Validation', options: ['Internal', 'External'] },
                         { id: 'leadershipStyle', label: 'Primary Leadership Style', options: ['Task-Leader', 'Social-Leader', 'Supporter', 'Challenger', 'Follower'] },
-                        { id: 'socialRole', label: 'Primary Social Role', options: ['Energy Giver', 'Energy Taker', 'Social Bridge', 'Isolate'] },
                         { id: 'commStyle', label: 'Dominant Communication Style', options: ['Direct & Honest', 'Supportive & Positive', 'Passive-Aggressive / Sarcastic', 'Quiet / Non-Verbal'] },
                         { id: 'conflictApproach', label: 'Approach to Conflict', options: ['Mediator', 'Confrontational', 'Avoidant', 'Escalator'] }
                     ]
                 },
                 {
-                    title: "SECTION 3: STRESS & RESILIENCE PROFILE",
-                    description: "Assesses how the player responds to setbacks, mistakes, and pressure, revealing their emotional regulation and resilience.",
+                    title: "SECTION 3: TRAINING & PERFORMANCE DYNAMICS",
+                    description: "This is the core of the observation. It logs how the athlete behaves and reacts within the training environment itself.",
                     params: [
-                        { id: 'personalErrorResponse', label: 'Primary Response to Personal Error', options: ['Accountability', 'Frustration', 'Blame', 'Indifference'] },
-                        { id: 'teammateErrorResponse', label: 'Primary Response to Teammate\'s Error', options: ['Encouragement', 'Correction', 'Frustration', 'Ignoring'] },
+                        { id: 'context', label: 'Context of Observation', options: ['Low-Pressure', 'Moderate-Pressure', 'High-Pressure'] },
+                        { id: 'focus', label: 'Focus & Activation', options: ['Proactive', 'Standard', 'Distracted'] },
+                        { id: 'personalErrorResponse', label: 'Reaction to Personal Error', options: ['Accountability', 'Frustration', 'Blame', 'Indifference'] },
+                        { id: 'teammateErrorResponse', label: 'Reaction to Teammate\'s Error', options: ['Encouragement', 'Correction', 'Frustration', 'Ignoring'] },
                         { id: 'perseverance', label: 'Perseverance Under Fatigue', options: ['High & Consistent Effort', 'Fluctuating Effort', 'Gives Up / Avoids'] },
-                        { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] }
+                        { id: 'language', label: 'Observed Dominant Language', options: ['Possibility-Focused', 'Problem-Focused'] }
                     ]
                 },
                 {
-                    title: "SECTION 4: SELF-ASSESSMENT INSIGHTS",
+                    title: "SECTION 4: MATCH DAY PRESSURE RESPONSE (Optional)",
+                    description: "This optional section assesses how the athlete handles the unique stress of competition.",
+                    params: [
+                         { id: 'preCompState', label: 'Pre-Competition State', options: ['Optimal Fighter', 'Anxious/Hyper-activated', 'Apathetic/Withdrawn'] },
+                         { id: 'pressureResponse', label: 'Response to High-Pressure', options: ['Thrives', 'Copes', 'Hides/Panics'] },
+                         { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] },
+                         { id: 'postMatchReaction', label: 'Post-Match Reaction', options: ['Balanced', 'Highly Emotional', 'Destructive/Blaming'] }
+                    ]
+                },
+                {
+                    title: "SECTION 5: SELF-ASSESSMENT INSIGHTS",
                     description: "A summary of the player's own perception of their mental game. Use the comments box for detailed notes.",
                     params: [
                         { id: 'perceivedStrengths', label: 'Player\'s Perceived Strengths', options: [] },
@@ -140,7 +164,7 @@
                     ]
                 },
                 {
-                    title: "SECTION 5: MENTAL SKILLS & ACTION PLAN",
+                    title: "SECTION 6: MENTAL SKILLS & ACTION PLAN",
                     description: "Track and score the implementation of key mental skills and intervention sessions. This forms the player's action plan.",
                     type: 'mental_skills',
                     params: [
@@ -206,8 +230,27 @@
                     const savedActivePlayer = localStorage.getItem('dynamicsLogActivePlayer');
                     const savedStructure = localStorage.getItem('dynamicsLogStructure');
                     if (savedStructure) {
-                        const loadedStructure = JSON.parse(savedStructure);
-                        if (Array.isArray(loadedStructure) && loadedStructure.length > 0) { Object.assign(logStructure, loadedStructure); }
+                        try {
+                           const loadedStructure = JSON.parse(savedStructure);
+                           if (Array.isArray(loadedStructure) && loadedStructure.length > 0) { 
+                               const defaultParamIds = new Set(logStructure.flatMap(s => s.params.map(p => p.id)));
+                               loadedStructure.forEach(loadedSection => {
+                                   const defaultSection = logStructure.find(s => s.title === loadedSection.title);
+                                   if (defaultSection) {
+                                       loadedSection.params = loadedSection.params.filter(p => defaultParamIds.has(p.id));
+                                       const loadedParamIds = new Set(loadedSection.params.map(p => p.id));
+                                       defaultSection.params.forEach(defaultParam => {
+                                           if (!loadedParamIds.has(defaultParam.id)) {
+                                               loadedSection.params.push(defaultParam);
+                                           }
+                                       });
+                                   }
+                               });
+                               Object.assign(logStructure, loadedStructure);
+                           }
+                        } catch (e) {
+                            console.error("Error parsing saved structure, using default.", e);
+                        }
                     }
                     if (savedPlayers) { players = JSON.parse(savedPlayers); }
                     if (savedActivePlayer) { activePlayerId = savedActivePlayer; }
@@ -222,9 +265,10 @@
                 logStructure.forEach((section, index) => {
                     html += `<fieldset id="fieldset-section-${index}" class="mb-6 border-t-2 border-teal-500 pt-2"><legend class="text-xl font-semibold text-teal-400 mb-2 px-2">${section.title}</legend><p class="text-sm text-gray-400 mb-4 px-2">${section.description}</p><div class="table-container">`;
                     if (section.type === 'mental_skills') {
-                        html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Session</th><th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Done</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Score (1-10)</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
+                        // ** UPDATED THIS LINE **
+                        html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Session</th><th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Re-Do</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Success Rate (1-10)</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
                         section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap text-center"><input type="checkbox" data-id="${param.id}" data-subtype="checked" class="log-input custom-checkbox"></td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"><option value="">N/A</option>${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specifics..."></textarea></td></tr>`; });
-                        html += `</tbody></table><div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2"><input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow"><button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button></div>`;
+                        html += `</tbody></table><div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2 hide-on-print"><input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow"><button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button></div>`;
                     } else {
                         html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Analyst Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
                         section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"><option value="">-- Select --</option>${param.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-type="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specific examples..."></textarea></td></tr>`; });
@@ -251,7 +295,12 @@
             const populateForm = (playerId) => {
                 const player = players.find(p => p.id === playerId);
                 if (!player) { clearForm(); return; }
-                if (!player.data) { player.data = generateNewLogData(); }
+                const defaultData = generateNewLogData();
+                player.data = { ...defaultData, ...player.data };
+                player.data.mentalSkills = { ...defaultData.mentalSkills, ...player.data.mentalSkills };
+                player.data['analyst-comments'] = { ...defaultData['analyst-comments'], ...player.data['analyst-comments'] };
+
+
                 playerDetailsSection.style.display = 'grid';
                 logDateInput.value = player.data.logDate || new Date().toISOString().split('T')[0];
                 playerDobInput.value = player.dob || '';
@@ -412,52 +461,64 @@
 
             const handleSaveAsPdf = async () => {
                 if (!activePlayerId) { showToast("Please select a player to generate a PDF."); return; }
-                showToast("Generating PDF... This may take a moment.");
                 const player = players.find(p => p.id === activePlayerId);
-                const { jsPDF } = window.jspdf;
+                if (!player) return;
+
+                showToast("Generating PDF...");
                 
-                const addImageToPdf = async (element, pdf, yPos, pageMargin, contentWidth) => {
-                    if (!element) return 0;
-                    const canvas = await html2canvas(element, { scale: 2, logging: false, backgroundColor: '#1f2937' });
+                document.body.classList.add('pdf-prepare');
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageMargin = 15;
+                const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
+                let currentY = pageMargin;
+
+                const addElementToPdf = async (element) => {
+                    if (!element) return;
+                    const canvas = await html2canvas(element, { 
+                        scale: 2, 
+                        logging: false,
+                        backgroundColor: null
+                    });
                     const imgData = canvas.toDataURL('image/png');
                     const imgProps = pdf.getImageProperties(imgData);
                     const pdfHeight = (imgProps.height * contentWidth) / imgProps.width;
-                    if (yPos + pdfHeight > pdf.internal.pageSize.getHeight() - pageMargin) {
+                    
+                    if (currentY + pdfHeight > pdf.internal.pageSize.getHeight() - pageMargin) {
                         pdf.addPage();
-                        yPos = pageMargin;
+                        currentY = pageMargin;
                     }
-                    pdf.addImage(imgData, 'PNG', pageMargin, yPos, contentWidth, pdfHeight);
-                    return pdfHeight;
+                    pdf.addImage(imgData, 'PNG', pageMargin, currentY, contentWidth, pdfHeight);
+                    currentY += pdfHeight + 5;
                 };
-
-                const actionElements = document.querySelectorAll('button, label[for="import-file"], input#player-name-input, select');
-                actionElements.forEach(el => el.classList.add('hide-for-pdf'));
                 
-                try {
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const pageMargin = 10;
-                    const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
-                    let currentY = pageMargin;
+                pdf.setFont('Inter', 'bold');
+                pdf.setFontSize(18);
+                pdf.setTextColor('#14b8a6');
+                pdf.text('Holistic Dynamics Log', pageMargin, currentY);
+                currentY += 8;
 
-                    const allSections = document.querySelectorAll('fieldset');
-                    
-                    // Add header and player details first
-                    currentY += await addImageToPdf(document.querySelector('header h1'), pdf, currentY, pageMargin, contentWidth) + 2;
-                    currentY += await addImageToPdf(document.getElementById('player-details-section'), pdf, currentY, pageMargin, contentWidth) + 5;
-                    
-                    for (const section of allSections) {
-                        currentY += await addImageToPdf(section, pdf, currentY, pageMargin, contentWidth) + 5;
-                    }
-                    
-                    pdf.save(`${player.name.replace(/\s+/g, '_')}_Log.pdf`);
-                } catch (err) {
-                    console.error("PDF generation failed:", err);
-                    showToast("Error creating PDF. Check console for details.");
-                } finally {
-                    actionElements.forEach(el => el.classList.remove('hide-for-pdf'));
+                pdf.setFont('Inter', 'normal');
+                pdf.setFontSize(12);
+                pdf.setTextColor('#000000');
+                pdf.text(`Player: ${player.name} ${player.shirtNumber ? `(#${player.shirtNumber})` : ''} | Position: ${player.position || 'N/A'}`, pageMargin, currentY);
+                currentY += 6;
+                pdf.text(`Log Date: logDateInput.value | D.O.B: ${player.dob || 'N/A'} (Age: ${playerAgeSpan.textContent || 'N/A'})`, pageMargin, currentY);
+                currentY += 10;
+                pdf.setDrawColor('#e0e0e0');
+                pdf.line(pageMargin, currentY - 5, contentWidth + pageMargin, currentY - 5);
+
+
+                const allSections = document.querySelectorAll('#dynamics-form fieldset');
+                for (const section of allSections) {
+                    await addElementToPdf(section);
                 }
-            };
 
+                pdf.save(`${player.name.replace(/\s+/g, '_')}_Log.pdf`);
+                document.body.classList.remove('pdf-prepare');
+                showToast("PDF saved successfully.");
+            };
 
             const handleReset = () => {
                 playerSelect.value = ""; activePlayerId = null;
