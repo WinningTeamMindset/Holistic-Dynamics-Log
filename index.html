@@ -97,53 +97,51 @@
             let players = [];
             let activePlayerId = null;
 
+            // Merged and re-ordered log structure based on the "Fiche"
             const logStructure = [
                 {
-                    title: "SECTION 1: FOUNDATIONAL READINESS",
-                    description: "This section is the foundation. It tells you if the athlete is physically and mentally prepared to train effectively before they even start.",
+                    title: "SECTION 1: INTERNAL REPRESENTATIONAL & MINDSET",
+                    description: "Defines the player's core mental operating system: how they learn, process information, and what drives their behavior.",
                     params: [
-                        { id: 'sleep', label: 'Athlete-Reported Sleep', options: ['Optimal (8+ hrs)', 'Sufficient (7-8 hrs)', 'Compromised (<7 hrs)'] },
-                        { id: 'readiness', label: 'Physiological Readiness', options: ['High', 'Moderate', 'Low'] },
-                        { id: 'punctuality', label: 'Morning Punctuality', options: ['Proactive', 'Standard', 'Reactive'] },
-                        { id: 'protocols', label: 'Adherence to Protocols', options: ['Diligent', 'Compliant', 'Avoidant'] }
-                    ]
-                },
-                {
-                    title: "SECTION 2: PSYCHOLOGICAL & BEHAVIORAL PROFILE",
-                    description: "This section is the athlete’s 'Operating System.' It reveals their default tendencies under pressure.",
-                    params: [
+                        { id: 'repSystem', label: 'Primary Representational System', options: ['Visual (Learns by seeing)', 'Auditory (Learns by hearing)', 'Kinesthetic (Learns by doing)'] },
+                        { id: 'infoProcessing', label: 'Information Processing Style', options: ["Global (The 'Why')", "Detail (The 'How')"] },
                         { id: 'motivation', label: 'Primary Motivational Driver', options: ['Towards Pleasure', 'Away From Pain'] },
                         { id: 'validation', label: 'Source of Validation', options: ['Internal', 'External'] },
-                        { id: 'processing', label: 'Information Processing Style', options: ["Global (The 'Why')", "Detail (The 'How')"] },
-                        { id: 'change', label: 'Response to Change & Novelty', options: ['Prefers Sameness', 'Energized by Difference'] },
-                        { id: 'social', label: 'Primary Social Orientation', options: ['Independent', 'Co-operative'] }
+                        { id: 'change', label: 'Response to Change & Novelty', options: ['Prefers Sameness', 'Energized by Difference'] }
                     ]
                 },
-                 {
-                    title: "SECTION 3: TRAINING & PERFORMANCE DYNAMICS",
-                    description: "This is the core of the observation. It logs how the athlete behaves within the training environment itself.",
+                {
+                    title: "SECTION 2: BEHAVIORAL & SOCIAL PROFILE",
+                    description: "Observes the player's default social roles and communication patterns within the team environment.",
                     params: [
-                        { id: 'context', label: 'Context of Observation', options: ['Low-Pressure', 'Moderate-Pressure', 'High-Pressure'] },
-                        { id: 'focus', label: 'Focus & Activation', options: ['Proactive', 'Standard', 'Distracted'] },
-                        { id: 'errorResponse', label: 'Reaction to Error/Setback', options: ['Resilient', 'Emotional (Internal)', 'Emotional (External)'] },
+                        { id: 'leadershipStyle', label: 'Primary Leadership Style', options: ['Task-Leader', 'Social-Leader', 'Supporter', 'Challenger', 'Follower'] },
+                        { id: 'socialRole', label: 'Primary Social Role', options: ['Energy Giver', 'Energy Taker', 'Social Bridge', 'Isolate'] },
+                        { id: 'commStyle', label: 'Dominant Communication Style', options: ['Direct & Honest', 'Supportive & Positive', 'Passive-Aggressive / Sarcastic', 'Quiet / Non-Verbal'] },
+                        { id: 'conflictApproach', label: 'Approach to Conflict', options: ['Mediator', 'Confrontational', 'Avoidant', 'Escalator'] }
+                    ]
+                },
+                {
+                    title: "SECTION 3: STRESS & RESILIENCE PROFILE",
+                    description: "Assesses how the player responds to setbacks, mistakes, and pressure, revealing their emotional regulation and resilience.",
+                    params: [
+                        { id: 'personalErrorResponse', label: 'Primary Response to Personal Error', options: ['Accountability', 'Frustration', 'Blame', 'Indifference'] },
+                        { id: 'teammateErrorResponse', label: 'Primary Response to Teammate\'s Error', options: ['Encouragement', 'Correction', 'Frustration', 'Ignoring'] },
                         { id: 'perseverance', label: 'Perseverance Under Fatigue', options: ['High & Consistent Effort', 'Fluctuating Effort', 'Gives Up / Avoids'] },
-                        { id: 'interaction', label: 'Coach/Teammate Interaction', options: ['Positive Connector', 'Task-Focused', 'Negative/Agitated'] },
-                        { id: 'language', label: 'Observed Dominant Language', options: ['Possibility-Focused', 'Problem-Focused'] }
+                        { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] }
                     ]
                 },
                 {
-                    title: "SECTION 4: MATCH DAY PRESSURE RESPONSE (Optional)",
-                    description: "This optional section assesses how the athlete handles the unique stress of competition.",
+                    title: "SECTION 4: SELF-ASSESSMENT INSIGHTS",
+                    description: "A summary of the player's own perception of their mental game. Use the comments box for detailed notes.",
                     params: [
-                         { id: 'preCompState', label: 'Pre-Competition State', options: ['Optimal Fighter', 'Anxious/Hyper-activated', 'Apathetic/Withdrawn'] },
-                         { id: 'pressureResponse', label: 'Response to High-Pressure', options: ['Thrives', 'Copes', 'Hides/Panics'] },
-                         { id: 'setbackBodyLanguage', label: 'Body Language After Setback', options: ['Resilient', 'Defeated', 'Agitated'] },
-                         { id: 'postMatchReaction', label: 'Post-Match Reaction', options: ['Balanced', 'Highly Emotional', 'Destructive/Blaming'] }
+                        { id: 'perceivedStrengths', label: 'Player\'s Perceived Strengths', options: [] },
+                        { id: 'perceivedWeaknesses', label: 'Player\'s Perceived Weaknesses', options: [] },
+                        { id: 'statedGoals', label: 'Player\'s Stated Goals', options: [] }
                     ]
                 },
                 {
-                    title: "SECTION 5: MENTAL SKILLS & SESSIONS TO DO LIST",
-                    description: "Track and score the implementation of key mental skills and intervention sessions.",
+                    title: "SECTION 5: MENTAL SKILLS & ACTION PLAN",
+                    description: "Track and score the implementation of key mental skills and intervention sessions. This forms the player's action plan.",
                     type: 'mental_skills',
                     params: [
                         { id: 'selfTalk', label: 'Positive Self Talk' }, { id: 'negativeSelfTalk', label: 'Negative Self Talk' },
@@ -432,7 +430,7 @@
                     return pdfHeight;
                 };
 
-                const actionElements = document.querySelectorAll('button, label[for="import-file"], input#player-name-input');
+                const actionElements = document.querySelectorAll('button, label[for="import-file"], input#player-name-input, select');
                 actionElements.forEach(el => el.classList.add('hide-for-pdf'));
                 
                 try {
@@ -440,22 +438,16 @@
                     const pageMargin = 10;
                     const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
                     let currentY = pageMargin;
+
+                    const allSections = document.querySelectorAll('fieldset');
                     
-                    // Page 1
+                    // Add header and player details first
+                    currentY += await addImageToPdf(document.querySelector('header h1'), pdf, currentY, pageMargin, contentWidth) + 2;
                     currentY += await addImageToPdf(document.getElementById('player-details-section'), pdf, currentY, pageMargin, contentWidth) + 5;
-                    currentY += await addImageToPdf(document.getElementById('fieldset-section-0'), pdf, currentY, pageMargin, contentWidth) + 5;
-                    await addImageToPdf(document.getElementById('fieldset-section-1'), pdf, currentY, pageMargin, contentWidth);
                     
-                    // Page 2
-                    pdf.addPage();
-                    currentY = pageMargin;
-                    currentY += await addImageToPdf(document.getElementById('fieldset-section-2'), pdf, currentY, pageMargin, contentWidth) + 5;
-                    await addImageToPdf(document.getElementById('fieldset-section-3'), pdf, currentY, pageMargin, contentWidth);
-                    
-                    // Page 3
-                    pdf.addPage();
-                    currentY = pageMargin;
-                    await addImageToPdf(document.getElementById('fieldset-section-4'), pdf, currentY, pageMargin, contentWidth);
+                    for (const section of allSections) {
+                        currentY += await addImageToPdf(section, pdf, currentY, pageMargin, contentWidth) + 5;
+                    }
                     
                     pdf.save(`${player.name.replace(/\s+/g, '_')}_Log.pdf`);
                 } catch (err) {
@@ -465,6 +457,7 @@
                     actionElements.forEach(el => el.classList.remove('hide-for-pdf'));
                 }
             };
+
 
             const handleReset = () => {
                 playerSelect.value = ""; activePlayerId = null;
