@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-900">
+<html lang="en" class="h-full bg-gray-900">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,84 +11,194 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-        input[type="file"] { display: none; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; min-width: 600px; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2dd4bf; color: #111827; padding: 10px 20px; border-radius: 8px; z-index: 1000; opacity: 0; transition: opacity 0.5s, transform 0.5s; font-weight: 500; }
-        .toast.show { opacity: 1; transform: translate(-50%, -10px); }
-        .custom-checkbox { appearance: none; background-color: #374151; border: 1px solid #6b7280; border-radius: 4px; width: 1.5rem; height: 1.5rem; cursor: pointer; position: relative; display: inline-block; vertical-align: middle; }
-        .custom-checkbox:checked { background-color: #14b8a6; border-color: #0d9488; }
-        .custom-checkbox:checked::after { content: '✔'; position: absolute; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; }
-        
-        /* Styles for PDF Generation */
-        .pdf-prepare .hide-for-pdf { display: none !important; }
-        .pdf-prepare body { background-color: white !important; }
-        .pdf-prepare #app { max-width: 100% !important; }
-        .pdf-prepare .bg-gray-900, .pdf-prepare .bg-gray-800 { background-color: white !important; }
-        .pdf-prepare .text-gray-200, .pdf-prepare .text-gray-300, .pdf-prepare .text-gray-400, .pdf-prepare .text-white { color: black !important; }
-        .pdf-prepare .border-gray-600, .pdf-prepare .border-gray-700 { border-color: #e0e0e0 !important; }
-        .pdf-prepare .border-teal-500 { border-color: #14b8a6 !important; }
-        .pdf-prepare .text-teal-400 { color: #14b8a6 !important; }
-        .pdf-prepare header { box-shadow: none !important; }
-        .pdf-prepare fieldset { page-break-inside: avoid; }
-
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        /* Style for the file input button */
+        input[type="file"] {
+            display: none;
+        }
+        /* Ensure responsive tables */
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            min-width: 600px; /* Prevent squishing on small screens */
+        }
+         /* Simple toast notification styling */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2dd4bf;
+            color: #111827;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            font-weight: 500;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, -10px);
+        }
+        /* Custom checkbox style */
+        .custom-checkbox {
+            appearance: none;
+            background-color: #374151;
+            border: 1px solid #6b7280;
+            border-radius: 4px;
+            width: 1.5rem;
+            height: 1.5rem;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .custom-checkbox:checked {
+            background-color: #14b8a6;
+            border-color: #0d9488;
+        }
+        .custom-checkbox:checked::after {
+            content: '✔';
+            position: absolute;
+            color: white;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+        }
+        /* Player picture styles */
+        #player-picture-container {
+            position: relative;
+        }
+        #player-picture {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            background-color: #374151;
+            border: 2px solid #4b5563;
+        }
+        #upload-picture-label {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 9999px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #1f2937;
+        }
     </style>
 </head>
-<body class="text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
-    <div id="app" class="max-w-7xl mx-auto flex flex-col">
-        <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg hide-for-pdf">
-            <h1 class="text-2xl font-bold text-teal-400 mb-4 text-center sm:text-left">Holistic Dynamics Log</h1>
-            <div id="player-details-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4 border-t border-gray-700 pt-4" style="display: none;">
-                <div>
-                    <label for="log-date" class="block text-sm font-medium text-gray-400">Date</label>
-                    <input type="date" id="log-date" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                </div>
-                <div>
-                    <label for="player-dob" class="block text-sm font-medium text-gray-400">D.O.B.</label>
-                    <input type="date" id="player-dob" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-400">Age</label>
-                    <span id="player-age" class="mt-1 flex items-center bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white w-full h-10"></span>
-                </div>
-                <div>
-                    <label for="player-position" class="block text-sm font-medium text-gray-400">Position</label>
-                    <input type="text" id="player-position" placeholder="e.g., Forward" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                </div>
-                <div>
-                    <label for="player-shirt-nr" class="block text-sm font-medium text-gray-400">Shirt Nr.</label>
-                    <input type="number" id="player-shirt-nr" placeholder="e.g., 10" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+<body class="h-full text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
+    <div id="app" class="max-w-7xl mx-auto flex flex-col h-full">
+        <!-- Header Section -->
+        <header class="bg-gray-800 rounded-lg p-4 mb-4 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h1 class="text-2xl font-bold text-teal-400">Holistic Dynamics Log</h1>
+                <!-- Player Selection -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="player-select" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full md:w-auto"></select>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row items-center gap-2 mb-4 border-t border-gray-700 pt-4">
-                <select id="player-select" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full sm:w-auto"></select>
-                <input id="player-name-input" type="text" placeholder="New player name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow w-full">
-                <button id="add-player-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Add Player</button>
-                <button id="delete-player-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Delete Player</button>
+            
+            <div id="pdf-content">
+                <!-- Player Details Section -->
+                 <div id="player-details-section" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 mt-4 border-t border-gray-700 pt-4">
+                    <!-- Player Picture -->
+                    <div id="player-picture-container" class="row-span-2 flex items-center justify-center">
+                        <img id="player-picture" src="https://placehold.co/100x100/374151/6b7280?text=Photo" alt="Player Picture">
+                        <label for="upload-picture-input" id="upload-picture-label" title="Upload Picture">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-fill" viewBox="0 0 16 16"><path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z"/></svg>
+                        </label>
+                        <input type="file" id="upload-picture-input" accept="image/*">
+                    </div>
+                    <div>
+                        <label for="log-date-from" class="block text-sm font-medium text-gray-400">Date From</label>
+                        <input type="date" id="log-date-from" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                     <div>
+                        <label for="log-date-to" class="block text-sm font-medium text-gray-400">Date To</label>
+                        <input type="date" id="log-date-to" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                     <div>
+                        <label for="player-dob" class="block text-sm font-medium text-gray-400">D.O.B.</label>
+                        <input type="date" id="player-dob" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">Age</label>
+                        <span id="player-age" class="mt-1 flex items-center bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white w-full h-10"></span>
+                    </div>
+                    <div>
+                        <label for="player-position" class="block text-sm font-medium text-gray-400">Position</label>
+                        <input type="text" id="player-position" placeholder="e.g., Forward" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                     <div>
+                        <label for="player-shirt-nr" class="block text-sm font-medium text-gray-400">Shirt Nr.</label>
+                        <input type="number" id="player-shirt-nr" placeholder="e.g., 10" class="player-detail-input mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-2 border-t border-gray-700 pt-4">
-                <button id="reset-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Clear for New Player</button>
-                <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Export Player Data</button>
-                <label for="import-file" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 cursor-pointer flex-1 sm:flex-grow-0 text-center">Import Player Data</label>
+
+            <!-- Add Player Section -->
+            <div class="flex flex-col sm:flex-row items-end gap-2 mt-4 border-t border-gray-700 pt-4">
+                 <div class="flex-grow">
+                     <label for="player-name-input" class="block text-sm font-medium text-gray-400">New Player Name</label>
+                     <input id="player-name-input" type="text" placeholder="Enter new player name..." class="mt-1 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none w-full">
+                 </div>
+                 <button id="add-player-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Add Player</button>
+                 <button id="delete-player-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 w-full sm:w-auto">Delete Active Player</button>
+            </div>
+
+             <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-2 mt-4 border-t border-gray-700 pt-4">
+                <button id="reset-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Clear Form</button>
+                <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Export JSON</button>
+                <label for="import-file" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 cursor-pointer flex-1 sm:flex-grow-0 text-center">Import JSON</label>
                 <input type="file" id="import-file" accept=".json">
                 <button id="pdf-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 flex-1 sm:flex-grow-0">Save as PDF</button>
             </div>
         </header>
 
-        <main class="flex-grow bg-gray-800 rounded-lg p-4 shadow-inner">
-            <form id="dynamics-form" onsubmit="return false;"></form>
+        <!-- Main Content: Log Form -->
+        <main class="flex-grow bg-gray-800 rounded-lg p-4 overflow-y-auto shadow-inner" id="log-form">
+            <form id="dynamics-form" onsubmit="return false;">
+                <!-- Log Sections will be dynamically inserted here -->
+            </form>
         </main>
         
+        <!-- Toast Notification -->
         <div id="toast" class="toast"></div>
+
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
             const playerSelect = document.getElementById('player-select');
             const playerNameInput = document.getElementById('player-name-input');
             const addPlayerBtn = document.getElementById('add-player-btn');
@@ -96,19 +206,24 @@
             const resetBtn = document.getElementById('reset-btn');
             const exportBtn = document.getElementById('export-btn');
             const importFile = document.getElementById('import-file');
-            const dynamicsForm = document.getElementById('dynamics-form');
-            const toastElement = document.getElementById('toast');
             const pdfBtn = document.getElementById('pdf-btn');
-            const playerDetailsSection = document.getElementById('player-details-section');
-            const logDateInput = document.getElementById('log-date');
-            const playerDobInput = document.getElementById('player-dob');
-            const playerAgeSpan = document.getElementById('player-age');
+            const logFormContainer = document.getElementById('dynamics-form');
+            const toastElement = document.getElementById('toast');
+            const logDateFromInput = document.getElementById('log-date-from');
+            const logDateToInput = document.getElementById('log-date-to');
             const playerPositionInput = document.getElementById('player-position');
             const playerShirtNrInput = document.getElementById('player-shirt-nr');
+            const playerDobInput = document.getElementById('player-dob');
+            const playerAgeSpan = document.getElementById('player-age');
+            const playerDetailsSection = document.getElementById('player-details-section');
+            const playerPictureImg = document.getElementById('player-picture');
+            const uploadPictureInput = document.getElementById('upload-picture-input');
 
+            // Application State
             let players = [];
             let activePlayerId = null;
 
+            // Log Structure Definition
             const logStructure = [
                 {
                     title: "SECTION 1: FOUNDATIONAL READINESS",
@@ -122,25 +237,24 @@
                 },
                 {
                     title: "SECTION 2: PSYCHOLOGICAL & BEHAVIORAL PROFILE",
-                    description: "This is the athlete’s 'Operating System.' It reveals their default tendencies, social roles, and communication styles.",
+                    description: "This section is the athlete’s 'Operating System.' It reveals their default tendencies under pressure.",
                     params: [
-                        { id: 'repSystem', label: 'Primary Representational System', options: ['Visual (Learns by seeing)', 'Auditory (Learns by hearing)', 'Kinesthetic (Learns by doing)'] },
                         { id: 'motivation', label: 'Primary Motivational Driver', options: ['Towards Pleasure', 'Away From Pain'] },
                         { id: 'validation', label: 'Source of Validation', options: ['Internal', 'External'] },
-                        { id: 'leadershipStyle', label: 'Primary Leadership Style', options: ['Task-Leader', 'Social-Leader', 'Supporter', 'Challenger', 'Follower'] },
-                        { id: 'commStyle', label: 'Dominant Communication Style', options: ['Direct & Honest', 'Supportive & Positive', 'Passive-Aggressive / Sarcastic', 'Quiet / Non-Verbal'] },
-                        { id: 'conflictApproach', label: 'Approach to Conflict', options: ['Mediator', 'Confrontational', 'Avoidant', 'Escalator'] }
+                        { id: 'processing', label: 'Information Processing Style', options: ["Global (The 'Why')", "Detail (The 'How')"] },
+                        { id: 'change', label: 'Response to Change & Novelty', options: ['Prefers Sameness', 'Energized by Difference'] },
+                        { id: 'social', label: 'Primary Social Orientation', options: ['Independent', 'Co-operative'] }
                     ]
                 },
-                {
+                 {
                     title: "SECTION 3: TRAINING & PERFORMANCE DYNAMICS",
-                    description: "This is the core of the observation. It logs how the athlete behaves and reacts within the training environment itself.",
+                    description: "This is the core of the observation. It logs how the athlete behaves within the training environment itself.",
                     params: [
                         { id: 'context', label: 'Context of Observation', options: ['Low-Pressure', 'Moderate-Pressure', 'High-Pressure'] },
                         { id: 'focus', label: 'Focus & Activation', options: ['Proactive', 'Standard', 'Distracted'] },
-                        { id: 'personalErrorResponse', label: 'Reaction to Personal Error', options: ['Accountability', 'Frustration', 'Blame', 'Indifference'] },
-                        { id: 'teammateErrorResponse', label: 'Reaction to Teammate\'s Error', options: ['Encouragement', 'Correction', 'Frustration', 'Ignoring'] },
+                        { id: 'errorResponse', label: 'Reaction to Error/Setback', options: ['Resilient', 'Emotional (Internal)', 'Emotional (External)'] },
                         { id: 'perseverance', label: 'Perseverance Under Fatigue', options: ['High & Consistent Effort', 'Fluctuating Effort', 'Gives Up / Avoids'] },
+                        { id: 'interaction', label: 'Coach/Teammate Interaction', options: ['Positive Connector', 'Task-Focused', 'Negative/Agitated'] },
                         { id: 'language', label: 'Observed Dominant Language', options: ['Possibility-Focused', 'Problem-Focused'] }
                     ]
                 },
@@ -155,13 +269,55 @@
                     ]
                 },
                 {
-                    title: "SECTION 5: STRENGTHS & CORRECTIONS ASSESSMENT",
-                    description: "A dual assessment identifying key strengths and areas for correction, from both the player's and coach's perspective.",
-                    type: 'assessment_grid' // New type for custom rendering
+                    title: "SECTION 5: PSYCHOLOGICAL PERFORMANCE COMPETENCIES",
+                    description: "A comprehensive assessment of key psychological traits and skills that underpin elite performance. Score each parameter based on observation.",
+                    type: 'mindset_matrix',
+                    subsections: [
+                        {
+                            title: 'Motivational & Commitment Factors',
+                            params: [
+                                { id: 'm_achievement_drive', label: 'Achievement Drive' }, { id: 'm_intrinsic_motivation', label: 'Intrinsic Motivation' },
+                                { id: 'm_goal_orientation', label: 'Goal Orientation (Task vs. Ego)' }, { id: 'm_work_ethic', label: 'Work Ethic' },
+                                { id: 'm_persistence', label: 'Persistence' }, { id: 'm_long_term_commitment', label: 'Long-term Commitment' },
+                                { id: 'm_resilience', label: 'Resilience' }, { id: 'm_coachability', label: 'Coachability' },
+                                { id: 'm_desire_to_excel', label: 'Desire to Excel' }, { id: 'm_self_discipline', label: 'Self-Discipline' }
+                            ]
+                        },
+                        {
+                            title: 'Emotional & Arousal Regulation',
+                            params: [
+                                { id: 'e_emotional_control', label: 'Emotional Control' }, { id: 'e_anxiety_management', label: 'Anxiety Management' },
+                                { id: 'e_arousal_control', label: 'Arousal Control (Activation)' }, { id: 'e_stress_coping', label: 'Stress Coping Skills' },
+                                { id: 'e_composure_under_pressure', label: 'Composure Under Pressure' }, { id: 'e_confidence', label: 'Confidence' },
+                                { id: 'e_emotional_stability', label: 'Emotional Stability' }, { id: 'e_optimism', label: 'Optimism' },
+                                { id: 'e_handling_adversity', label: 'Handling Adversity' }, { id: 'e_emotional_expression', label: 'Emotional Expression' }
+                            ]
+                        },
+                        {
+                            title: 'Cognitive & Attentional Skills',
+                            params: [
+                                { id: 'c_concentration', label: 'Concentration / Focus' }, { id: 'c_decision_making', label: 'Decision Making Quality' },
+                                { id: 'c_attentional_flexibility', label: 'Attentional Flexibility' }, { id: 'c_situational_awareness', label: 'Situational Awareness' },
+                                { id: 'c_problem_solving', label: 'Problem Solving' }, { id: 'c_mental_toughness', label: 'Mental Toughness' },
+                                { id: 'c_imagery_skills', label: 'Imagery / Visualization Skills' }, { id: 'c_self_talk_quality', label: 'Self-Talk Quality' },
+                                { id: 'c_tactical_understanding', label: 'Tactical Understanding' }, { id: 'c_anticipation', label: 'Anticipation Skills' }
+                            ]
+                        },
+                        {
+                            title: 'Interpersonal & Team Dynamics',
+                            params: [
+                                { id: 'i_communication_skills', label: 'Communication Skills' }, { id: 'i_leadership_qualities', label: 'Leadership Qualities' },
+                                { id: 'i_teamwork_cohesion', label: 'Teamwork / Cohesion' }, { id: 'i_social_support', label: 'Social Support Seeking' },
+                                { id: 'i_empathy', label: 'Empathy / Perspective Taking' }, { id: 'i_conflict_resolution', label: 'Conflict Resolution' },
+                                { id: 'i_respect_for_others', label: 'Respect for Others' }, { id: 'i_responsibility', label: 'Responsibility / Accountability' },
+                                { id: 'i_trustworthiness', label: 'Trustworthiness' }, { id: 'i_adaptability_social', label: 'Social Adaptability' }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    title: "SECTION 6: MENTAL SKILLS & ACTION PLAN",
-                    description: "Track and score the implementation of key mental skills and intervention sessions. This forms the player's action plan.",
+                    title: "SECTION 6: MENTAL SKILLS & SESSIONS TO DO LIST",
+                    description: "Track and score the implementation of key mental skills and intervention sessions.",
                     type: 'mental_skills',
                     params: [
                         { id: 'selfTalk', label: 'Positive Self Talk' }, { id: 'negativeSelfTalk', label: 'Negative Self Talk' },
@@ -176,10 +332,14 @@
                 }
             ];
 
+            // --- Utility Functions ---
+
             const showToast = (message) => {
                 toastElement.textContent = message;
                 toastElement.classList.add('show');
-                setTimeout(() => { toastElement.classList.remove('show'); }, 3000);
+                setTimeout(() => {
+                    toastElement.classList.remove('show');
+                }, 3000);
             };
 
             const calculateAge = (dobString) => {
@@ -188,34 +348,43 @@
                 const today = new Date();
                 let age = today.getFullYear() - dob.getFullYear();
                 const m = today.getMonth() - dob.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) { age--; }
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
                 return age >= 0 ? age : '';
             };
 
             const generateNewLogData = () => {
-                const data = { logDate: new Date().toISOString().split('T')[0] };
-                data.assessmentGrid = {};
-                ['player_strength', 'player_correction', 'coach_strength', 'coach_correction'].forEach(type => {
-                    for (let i = 1; i <= 5; i++) {
-                        data.assessmentGrid[`${type}_${i}_text`] = '';
-                        data.assessmentGrid[`${type}_${i}_score`] = '';
-                    }
-                });
-
+                const data = {
+                    logDateFrom: new Date().toISOString().split('T')[0],
+                    logDateTo: new Date().toISOString().split('T')[0]
+                };
                 logStructure.forEach(section => {
                     if (section.type === 'mental_skills') {
                         data.mentalSkills = {};
-                        section.params.forEach(param => { data.mentalSkills[param.id] = { checked: false, score: '', comment: '' }; });
-                    } else if (section.type !== 'assessment_grid') {
-                        if (!data['analyst-comments']) data['analyst-comments'] = {};
+                        section.params.forEach(param => {
+                            data.mentalSkills[param.id] = { checked: false, score: '', comment: '' };
+                        });
+                    } else if (section.type === 'mindset_matrix') {
+                        data.mindsetMatrix = {};
+                        section.subsections.forEach(sub => {
+                            sub.params.forEach(param => {
+                                data.mindsetMatrix[param.id] = { score: '', comment: '' };
+                            });
+                        });
+                    } else {
+                        if (!data['comments']) data['comments'] = {};
                         section.params.forEach(param => {
                             data[param.id] = '';
-                            data['analyst-comments'][param.id] = '';
+                            data['comments'][param.id] = '';
                         });
                     }
                 });
                 return data;
             };
+
+
+            // --- Data Persistence ---
 
             const saveData = () => {
                 try {
@@ -223,7 +392,7 @@
                     localStorage.setItem('dynamicsLogActivePlayer', activePlayerId);
                     localStorage.setItem('dynamicsLogStructure', JSON.stringify(logStructure));
                 } catch (e) {
-                    console.error("Failed to save data:", e);
+                    console.error("Failed to save data to localStorage", e);
                     showToast("Error: Could not save data.");
                 }
             };
@@ -232,134 +401,261 @@
                 try {
                     const savedPlayers = localStorage.getItem('dynamicsLogPlayers');
                     const savedActivePlayer = localStorage.getItem('dynamicsLogActivePlayer');
-                    // We don't load the structure anymore to ensure the code's structure is always used
-                    if (savedPlayers) { players = JSON.parse(savedPlayers); }
-                    if (savedActivePlayer) { activePlayerId = savedActivePlayer; }
+                    const savedStructure = localStorage.getItem('dynamicsLogStructure');
+
+                    if (savedStructure) {
+                        const loadedStructure = JSON.parse(savedStructure);
+                        if (Array.isArray(loadedStructure) && loadedStructure.length > 0) {
+                           Object.assign(logStructure, loadedStructure);
+                        }
+                    }
+
+                    if (savedPlayers) {
+                        players = JSON.parse(savedPlayers);
+                    }
+                    if (savedActivePlayer) {
+                        activePlayerId = savedActivePlayer;
+                    }
                 } catch (e) {
-                    console.error("Failed to load data:", e);
-                    players = []; activePlayerId = null; showToast("Error: Could not load data.");
+                    console.error("Failed to load data from localStorage", e);
+                    players = [];
+                    activePlayerId = null;
+                    showToast("Error: Could not load saved data.");
                 }
             };
+            
+            // --- UI Rendering ---
 
             const renderLogForm = () => {
                 let html = '';
-                const scoreOptions = `<option value="">N/A</option>${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}`;
-
-                logStructure.forEach((section, index) => {
-                    html += `<fieldset id="fieldset-section-${index}" class="mb-6 border-t-2 border-teal-500 pt-2"><legend class="text-xl font-semibold text-teal-400 mb-2 px-2">${section.title}</legend><p class="text-sm text-gray-400 mb-4 px-2">${section.description}</p><div class="table-container">`;
-                    
-                    if (section.type === 'assessment_grid') {
-                        const createGrid = (type, title) => {
-                            let gridHtml = `<h3 class="text-lg font-medium text-gray-300 mt-4 mb-2 px-2">${title}</h3>`;
-                            gridHtml += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th class="w-12 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">${type.includes('strength') ? 'Strength' : 'Correction'}</th><th class="w-40 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Score (1-10)</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
-                            for (let i = 1; i <= 5; i++) {
-                                gridHtml += `<tr>
-                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${i}</td>
-                                    <td class="px-4 py-4"><input type="text" data-id="${type}_${i}_text" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"></td>
-                                    <td class="px-4 py-4"><select data-id="${type}_${i}_score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">${scoreOptions}</select></td>
-                                </tr>`;
-                            }
-                            gridHtml += '</tbody></table>';
-                            return gridHtml;
-                        };
-                        html += createGrid('player_strength', "Player's Self-Assessment: 5 Strengths");
-                        html += createGrid('player_correction', "Player's Self-Assessment: 5 Corrections");
-                        html += createGrid('coach_strength', "Coach's Assessment: 5 Strengths");
-                        html += createGrid('coach_correction', "Coach's Assessment: 5 Corrections");
-
+                logStructure.forEach(section => {
+                    html += `
+                        <fieldset class="mb-6 border-t-2 border-teal-500 pt-2">
+                            <legend class="text-xl font-semibold text-teal-400 mb-2 px-2">${section.title}</legend>
+                            <p class="text-sm text-gray-400 mb-4 px-2">${section.description}</p>
+                            <div class="table-container">
+                    `;
+                    if (section.type === 'mindset_matrix') {
+                        section.subsections.forEach(sub => {
+                            html += `<h3 class="text-lg font-medium text-gray-300 mt-6 mb-2 px-2">${sub.title}</h3>`;
+                            html += `<table class="min-w-full divide-y divide-gray-700">
+                                        <thead class="bg-gray-700/50">
+                                            <tr>
+                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">PARAMETER</th>
+                                                <th scope="col" class="w-40 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">SCORE (1-10)</th>
+                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">COMMENTS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-gray-800 divide-y divide-gray-700">`;
+                            sub.params.forEach(param => {
+                                html += `<tr>
+                                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td>
+                                            <td class="px-4 py-4"><select data-id="${param.id}" data-type="mindset_matrix" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"><option value="">N/A</option>${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}</select></td>
+                                            <td class="px-4 py-4"><textarea data-id="${param.id}" data-type="mindset_matrix" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Comments..."></textarea></td>
+                                         </tr>`;
+                            });
+                            html += `</tbody></table>`;
+                        });
                     } else if (section.type === 'mental_skills') {
-                        html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Session</th><th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Re-Do</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Success Rate (1-10)</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
-                        section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap text-center"><input type="checkbox" data-id="${param.id}" data-subtype="checked" class="log-input custom-checkbox"></td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">${scoreOptions}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specifics..."></textarea></td></tr>`; });
-                        html += `</tbody></table><div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2 hide-on-print"><input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow"><button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button></div>`;
+                        html += `
+                                <table class="min-w-full divide-y divide-gray-700">
+                                    <thead class="bg-gray-700/50">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">SESSIONS</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider text-center">RE-DO</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">SCORE (1-10)</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">COMMENTS</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                        ${section.params.map(param => `
+                                            <tr>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-center">
+                                                    <input type="checkbox" data-id="${param.id}" data-type="mental_skills" data-subtype="checked" class="log-input custom-checkbox">
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    <select data-id="${param.id}" data-type="mental_skills" data-subtype="score" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                                        <option value="">N/A</option>
+                                                        ${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join('')}
+                                                    </select>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <textarea data-id="${param.id}" data-type="mental_skills" data-subtype="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Comments..."></textarea>
+                                                </td>
+                                                <td class="px-4 py-4 text-center">
+                                                    ${param.isCustom ? `<button type="button" class="delete-session-btn text-red-500 hover:text-red-400 font-bold text-xl" data-id="${param.id}">&times;</button>` : ''}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                                <!-- ADD NEW SESSION UI -->
+                                <div class="mt-4 p-4 border-t border-gray-700 flex flex-col sm:flex-row gap-2">
+                                    <input id="new-session-input" type="text" placeholder="New session name..." class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-teal-500 focus:outline-none flex-grow">
+                                    <button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button>
+                                </div>
+                                `;
                     } else {
-                        html += `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-700/50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Analyst Comments</th></tr></thead><tbody class="bg-gray-800 divide-y divide-gray-700">`;
-                        section.params.forEach(param => { html += `<tr><td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td><td class="px-4 py-4 whitespace-nowrap"><select data-id="${param.id}" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none"><option value="">-- Select --</option>${param.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select></td><td class="px-4 py-4"><textarea data-id="${param.id}" data-type="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Specific examples..."></textarea></td></tr>`; });
-                        html += `</tbody></table>`;
+                        html += `
+                                <table class="min-w-full divide-y divide-gray-700">
+                                    <thead class="bg-gray-700/50">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Parameter</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Observation / Selection</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">COMMENTS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                        ${section.params.map(param => `
+                                            <tr>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${param.label}</td>
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    <select data-id="${param.id}" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                                        <option value="">-- Select --</option>
+                                                        ${param.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                                                    </select>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <textarea data-id="${param.id}" data-type="comment" class="log-input bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full h-16 resize-y focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Comments..."></textarea>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>`;
                     }
-                    html += `</div></fieldset>`;
+                     html += `</div></fieldset>`;
                 });
-                dynamicsForm.innerHTML = html;
+                logFormContainer.innerHTML = html;
                 document.getElementById('add-session-btn')?.addEventListener('click', handleAddSession);
+                logFormContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-session-btn')) {
+                        handleDeleteSession(e.target.dataset.id);
+                    }
+                });
             };
 
             const updatePlayerDropdown = () => {
-                const currentVal = playerSelect.value;
                 playerSelect.innerHTML = '<option value="">-- Select a Player --</option>';
                 players.forEach(p => {
                     const option = document.createElement('option');
                     option.value = p.id;
                     option.textContent = `${p.name} ${p.shirtNumber ? `(#${p.shirtNumber})` : ''}`;
+                    if (p.id === activePlayerId) {
+                        option.selected = true;
+                    }
                     playerSelect.appendChild(option);
                 });
-                playerSelect.value = currentVal;
+                playerDetailsSection.style.display = activePlayerId ? 'grid' : 'none';
             };
 
             const populateForm = (playerId) => {
                 const player = players.find(p => p.id === playerId);
-                if (!player) { clearForm(); return; }
-                const defaultData = generateNewLogData();
-                player.data = { ...defaultData, ...player.data };
-                player.data.assessmentGrid = { ...defaultData.assessmentGrid, ...player.data.assessmentGrid };
-                player.data.mentalSkills = { ...defaultData.mentalSkills, ...player.data.mentalSkills };
-                player.data['analyst-comments'] = { ...defaultData['analyst-comments'], ...player.data['analyst-comments'] };
-
-                playerDetailsSection.style.display = 'grid';
-                logDateInput.value = player.data.logDate || new Date().toISOString().split('T')[0];
-                playerDobInput.value = player.dob || '';
-                playerAgeSpan.textContent = calculateAge(player.dob);
+                if (!player) {
+                    clearForm();
+                    return;
+                }
+                
+                // Populate player details
+                playerPictureImg.src = player.picture || 'https://placehold.co/100x100/374151/6b7280?text=Photo';
+                logDateFromInput.value = player.data.logDateFrom || '';
+                logDateToInput.value = player.data.logDateTo || '';
                 playerPositionInput.value = player.position || '';
                 playerShirtNrInput.value = player.shirtNumber || '';
-                
+                playerDobInput.value = player.dob || '';
+                playerAgeSpan.textContent = calculateAge(player.dob);
+
+                // Populate log data
                 document.querySelectorAll('.log-input').forEach(input => {
                     const dataId = input.dataset.id;
+                    const dataType = input.dataset.type;
                     const subtype = input.dataset.subtype;
 
-                    if (player.data.assessmentGrid && dataId in player.data.assessmentGrid) {
-                        input.value = player.data.assessmentGrid[dataId] || '';
-                    } else if (subtype) { // Mental Skills
-                        if (player.data.mentalSkills && player.data.mentalSkills[dataId]) {
-                            if (subtype === 'checked') input.checked = player.data.mentalSkills[dataId].checked || false;
-                            else input.value = player.data.mentalSkills[dataId].score || '';
+                    if (dataType === 'mindset_matrix') {
+                        if (player.data.mindsetMatrix && player.data.mindsetMatrix[dataId]) {
+                            input.value = player.data.mindsetMatrix[dataId][subtype] || '';
+                        } else {
+                            input.value = '';
                         }
-                    } else if (input.dataset.type === 'comment') { // Standard Analyst Comments
-                        if (player.data['analyst-comments']) input.value = player.data['analyst-comments'][dataId] || '';
-                    } else { // Standard Select
+                    } else if (dataType === 'mental_skills') {
+                        if(player.data.mentalSkills && player.data.mentalSkills[dataId]) {
+                             if (subtype === 'checked') {
+                                input.checked = player.data.mentalSkills[dataId].checked || false;
+                            } else {
+                                input.value = player.data.mentalSkills[dataId][subtype] || '';
+                            }
+                        } else {
+                            if (subtype === 'checked') input.checked = false; else input.value = '';
+                        }
+                    } else if (dataType === 'comment') {
+                        if (player.data.comments) {
+                           input.value = player.data.comments[dataId] || '';
+                        } else {
+                            input.value = '';
+                        }
+                    } else {
                         input.value = player.data[dataId] || '';
                     }
                 });
             };
 
             const clearForm = () => {
-                dynamicsForm.reset();
-                playerDetailsSection.style.display = 'none';
-                logDateInput.value = '';
-                playerDobInput.value = '';
-                playerAgeSpan.textContent = '';
+                document.getElementById('dynamics-form').reset();
+                playerPictureImg.src = 'https://placehold.co/100x100/374151/6b7280?text=Photo';
+                logDateFromInput.value = '';
+                logDateToInput.value = '';
                 playerPositionInput.value = '';
                 playerShirtNrInput.value = '';
+                playerDobInput.value = '';
+                playerAgeSpan.textContent = '';
+                if (!activePlayerId) {
+                    playerDetailsSection.style.display = 'none';
+                }
             };
-            
+
+            // --- Event Handlers ---
+
             const handleAddPlayer = () => {
                 const name = playerNameInput.value.trim();
-                if (!name) { showToast("Please enter a player name."); return; }
-                if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) { showToast("A player with this name already exists."); return; }
-                const newPlayer = { id: `player_${Date.now()}`, name: name, data: generateNewLogData() };
+                if (!name) {
+                    showToast("Please enter a player name.");
+                    return;
+                }
+                if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                    showToast("A player with this name already exists.");
+                    return;
+                }
+                const newPlayer = {
+                    id: `player_${Date.now()}`,
+                    name: name,
+                    position: '',
+                    shirtNumber: '',
+                    dob: '',
+                    picture: '',
+                    data: generateNewLogData()
+                };
                 players.push(newPlayer);
                 activePlayerId = newPlayer.id;
                 playerNameInput.value = '';
+                
                 updateAndSave();
                 showToast(`Player "${name}" added.`);
             };
 
             const handleDeletePlayer = () => {
-                if (!activePlayerId) { showToast("No player selected to delete."); return; }
+                if (!activePlayerId) {
+                    showToast("No player selected to delete.");
+                    return;
+                }
                 const playerIndex = players.findIndex(p => p.id === activePlayerId);
                 if (playerIndex > -1) {
-                    if (confirm(`Are you sure you want to delete player: ${players[playerIndex].name}?`)) {
+                    const modalConfirm = confirm(`Are you sure you want to delete player: ${players[playerIndex].name}? This cannot be undone.`);
+                    if (modalConfirm) {
                         const playerName = players[playerIndex].name;
                         players.splice(playerIndex, 1);
-                        const newIndex = Math.max(0, playerIndex - 1);
-                        activePlayerId = players.length > 0 ? players[newIndex].id : null;
+                        activePlayerId = players.length > 0 ? players[0].id : null;
+                        
                         updateAndSave();
                         showToast(`Player "${playerName}" deleted.`);
                     }
@@ -368,190 +664,315 @@
             
             const handlePlayerSelect = (e) => {
                 activePlayerId = e.target.value;
-                if (activePlayerId) { populateForm(activePlayerId); } 
-                else { clearForm(); }
+                if(activePlayerId) {
+                    populateForm(activePlayerId);
+                } else {
+                    clearForm();
+                }
+                updatePlayerDropdown(); // To show/hide details section
                 saveData();
             };
 
             const handleFormInput = (e) => {
                 if (!activePlayerId) return;
+                
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
                 
-                const dataId = e.target.dataset.id;
-
-                if (e.target.classList.contains('player-detail-input')) {
-                    const id = e.target.id;
-                    if (id === 'log-date') player.data.logDate = e.target.value;
-                    else if (id === 'player-dob') { player.dob = e.target.value; playerAgeSpan.textContent = calculateAge(player.dob); }
-                    else if (id === 'player-position') player.position = e.target.value;
-                    else if (id === 'player-shirt-nr') { player.shirtNumber = e.target.value; updatePlayerDropdown(); }
-                } else if (player.data.assessmentGrid && dataId in player.data.assessmentGrid) {
-                    player.data.assessmentGrid[dataId] = e.target.value;
-                } else {
-                    const subtype = e.target.dataset.subtype;
-                    if (subtype) {
-                        if (!player.data.mentalSkills[dataId]) player.data.mentalSkills[dataId] = { checked: false, score: '', comment: '' };
-                        if(subtype === 'checked') player.data.mentalSkills[dataId].checked = e.target.checked;
-                        if(subtype === 'score') player.data.mentalSkills[dataId].score = e.target.value;
-                        if(subtype === 'comment') player.data.mentalSkills[dataId].comment = e.target.value;
-                    } else if (e.target.dataset.type === 'comment') {
-                        player.data['analyst-comments'][dataId] = e.target.value;
-                    } else {
-                        player.data[dataId] = e.target.value;
+                if(e.target.classList.contains('player-detail-input')) {
+                    if (e.target.id === 'log-date-from') player.data.logDateFrom = e.target.value;
+                    if (e.target.id === 'log-date-to') player.data.logDateTo = e.target.value;
+                    if (e.target.id === 'player-position') player.position = e.target.value;
+                    if (e.target.id === 'player-shirt-nr') {
+                        player.shirtNumber = e.target.value;
+                        updatePlayerDropdown();
                     }
+                    if(e.target.id === 'player-dob'){
+                        player.dob = e.target.value;
+                        playerAgeSpan.textContent = calculateAge(player.dob);
+                    }
+                    saveData();
+                    return;
+                }
+
+                const dataId = e.target.dataset.id;
+                const dataType = e.target.dataset.type;
+                const subtype = e.target.dataset.subtype;
+
+                if (dataType === 'mindset_matrix') {
+                    if (!player.data.mindsetMatrix) player.data.mindsetMatrix = {};
+                    if (!player.data.mindsetMatrix[dataId]) player.data.mindsetMatrix[dataId] = { score: '', comment: '' };
+                    player.data.mindsetMatrix[dataId][subtype] = e.target.value;
+                }
+                else if (dataType === 'mental_skills') {
+                    if (!player.data.mentalSkills) player.data.mentalSkills = {};
+                    if (!player.data.mentalSkills[dataId]) player.data.mentalSkills[dataId] = { checked: false, score: '', comment: '' };
+                    if(subtype === 'checked') {
+                        player.data.mentalSkills[dataId][subtype] = e.target.checked;
+                    } else {
+                        player.data.mentalSkills[dataId][subtype] = e.target.value;
+                    }
+                } else if (dataType === 'comment') {
+                    if (!player.data.comments) player.data.comments = {};
+                    player.data.comments[dataId] = e.target.value;
+                } else {
+                    player.data[dataId] = e.target.value;
                 }
                 saveData();
             };
-            
+
             const handleAddSession = () => {
                 const newSessionInput = document.getElementById('new-session-input');
                 const sessionName = newSessionInput.value.trim();
-                if (!sessionName) { showToast("Please enter a name for the new session."); return; }
+                if (!sessionName) {
+                    showToast("Please enter a name for the new session.");
+                    return;
+                }
+
                 const sessionId = sessionName.toLowerCase().replace(/\s+/g, '_') + `_${Date.now()}`;
+                
                 const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
-                if (mentalSkillsSection.params.some(p => p.label.toLowerCase() === sessionName.toLowerCase())) { showToast("This session already exists."); return; }
-                mentalSkillsSection.params.push({ id: sessionId, label: sessionName });
+                if (mentalSkillsSection.params.some(p => p.label.toLowerCase() === sessionName.toLowerCase())) {
+                    showToast("This session already exists.");
+                    return;
+                }
+
+                mentalSkillsSection.params.push({ id: sessionId, label: sessionName, isCustom: true });
+                
                 players.forEach(player => {
                     if (!player.data.mentalSkills) player.data.mentalSkills = {};
                     player.data.mentalSkills[sessionId] = { checked: false, score: '', comment: '' };
                 });
+
                 newSessionInput.value = '';
                 renderLogForm();
-                if (activePlayerId) populateForm(activePlayerId);
+                populateForm(activePlayerId);
                 saveData();
                 showToast(`Session "${sessionName}" added.`);
             };
+            
+            const handleDeleteSession = (sessionId) => {
+                if (!sessionId) return;
+                
+                const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
+                const sessionIndex = mentalSkillsSection.params.findIndex(p => p.id === sessionId);
+                
+                if (sessionIndex > -1) {
+                    const sessionName = mentalSkillsSection.params[sessionIndex].label;
+                    if(confirm(`Are you sure you want to permanently delete the session "${sessionName}" for all players?`)){
+                        mentalSkillsSection.params.splice(sessionIndex, 1);
+                        players.forEach(player => {
+                            if (player.data.mentalSkills && player.data.mentalSkills[sessionId]) {
+                                delete player.data.mentalSkills[sessionId];
+                            }
+                        });
+                        renderLogForm();
+                        populateForm(activePlayerId);
+                        saveData();
+                        showToast(`Session "${sessionName}" deleted.`);
+                    }
+                }
+            };
+
+            const handlePictureUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file || !activePlayerId) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const player = players.find(p => p.id === activePlayerId);
+                    if (player) {
+                        player.picture = event.target.result;
+                        playerPictureImg.src = event.target.result;
+                        saveData();
+                        showToast('Picture updated.');
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
 
             const handleExport = () => {
-                if (!activePlayerId) { showToast("Please select a player to export."); return; }
+                if (!activePlayerId) {
+                    showToast("Please select a player to export.");
+                    return;
+                }
                 const player = players.find(p => p.id === activePlayerId);
                 if (!player) return;
-                const exportData = { player: player };
+
+                const exportData = {
+                    player: player,
+                    structure: logStructure
+                };
+
                 const dataStr = JSON.stringify(exportData, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url; a.download = `${player.name.replace(/\s+/g, '_')}_dynamics_log.json`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                a.href = url;
+                a.download = `${player.name.replace(/\s+/g, '_')}_dynamics_log.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
                 showToast(`Data for "${player.name}" exported.`);
             };
 
+            const handleSaveAsPdf = () => {
+                if (!activePlayerId) {
+                    showToast("Please select a player to generate a PDF.");
+                    return;
+                }
+                showToast("Generating PDF... Please wait.");
+                const player = players.find(p => p.id === activePlayerId);
+                
+                const { jsPDF } = window.jspdf;
+                const pdfContent = document.getElementById('pdf-content');
+                const logForm = document.getElementById('log-form');
+                
+                // Temporarily clone and prepare for PDF
+                const pdfContainer = document.createElement('div');
+                const pdfHeader = pdfContent.cloneNode(true);
+                const pdfMain = logForm.cloneNode(true);
+                pdfContainer.appendChild(pdfHeader);
+                pdfContainer.appendChild(pdfMain);
+                document.body.appendChild(pdfContainer);
+
+                html2canvas(pdfContainer, { backgroundColor: '#111827', scale: 2 }).then(canvas => {
+                    document.body.removeChild(pdfContainer); // Clean up clone
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = imgWidth / imgHeight;
+                    const pdfWidth = pageWidth;
+                    const pdfHeight = pdfWidth / ratio;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
+                });
+            };
+
             const handleImport = (e) => {
-                const file = e.target.files[0]; if (!file) return;
+                const file = e.target.files[0];
+                if (!file) return;
+
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
                         const importedData = JSON.parse(event.target.result);
                         const importedPlayer = importedData.player || importedData;
-                        if (!importedPlayer.id || !importedPlayer.name || !importedPlayer.data) { throw new Error("Invalid file format."); }
+                        const importedStructure = importedData.structure;
+
+                        if (!importedPlayer.id || !importedPlayer.name || !importedPlayer.data) {
+                           throw new Error("Invalid file format.");
+                        }
+
+                        if (importedStructure) {
+                            const mentalSkillsSection = logStructure.find(s => s.type === 'mental_skills');
+                            const importedMentalSkills = importedStructure.find(s => s.type === 'mental_skills');
+                            
+                            if (importedMentalSkills) {
+                                importedMentalSkills.params.forEach(importedParam => {
+                                    if (importedParam.isCustom && !mentalSkillsSection.params.some(p => p.id === importedParam.id)) {
+                                        mentalSkillsSection.params.push(importedParam);
+                                    }
+                                });
+                            }
+                        }
                         
                         const existingPlayerIndex = players.findIndex(p => p.id === importedPlayer.id || p.name.toLowerCase() === importedPlayer.name.toLowerCase());
-                        if (existingPlayerIndex > -1) { players[existingPlayerIndex] = importedPlayer; showToast(`Player "${importedPlayer.name}" data updated.`); } 
-                        else { players.push(importedPlayer); showToast(`Player "${importedPlayer.name}" imported.`); }
+                        
+                        if (existingPlayerIndex > -1) {
+                           players[existingPlayerIndex] = importedPlayer;
+                           showToast(`Player "${importedPlayer.name}" data updated.`);
+                        } else {
+                           players.push(importedPlayer);
+                           showToast(`Player "${importedPlayer.name}" imported.`);
+                        }
                         activePlayerId = importedPlayer.id;
+                        
+                        renderLogForm();
                         updateAndSave();
-                    } catch (err) { console.error("Import failed:", err); showToast("Import failed. Please select a valid file."); }
+
+                    } catch (err) {
+                        console.error("Import failed:", err);
+                        showToast("Import failed. Please select a valid file.");
+                    }
                     e.target.value = null;
                 };
                 reader.readAsText(file);
             };
 
-            const handleSaveAsPdf = async () => {
-                if (!activePlayerId) { showToast("Please select a player to generate a PDF."); return; }
-                const player = players.find(p => p.id === activePlayerId);
-                if (!player) return;
-
-                showToast("Generating PDF...");
-                
-                document.body.classList.add('pdf-prepare');
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageMargin = 15;
-                const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
-                let currentY = pageMargin;
-
-                const addElementToPdf = async (element) => {
-                    if (!element) return;
-                    const canvas = await html2canvas(element, { 
-                        scale: 2, 
-                        logging: false,
-                        backgroundColor: null
-                    });
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const pdfHeight = (imgProps.height * contentWidth) / imgProps.width;
-                    
-                    if (currentY + pdfHeight > pdf.internal.pageSize.getHeight() - pageMargin) {
-                        pdf.addPage();
-                        currentY = pageMargin;
-                    }
-                    pdf.addImage(imgData, 'PNG', pageMargin, currentY, contentWidth, pdfHeight);
-                    currentY += pdfHeight + 5;
-                };
-                
-                pdf.setFont('Inter', 'bold');
-                pdf.setFontSize(18);
-                pdf.setTextColor('#14b8a6');
-                pdf.text('Holistic Dynamics Log', pageMargin, currentY);
-                currentY += 8;
-
-                pdf.setFont('Inter', 'normal');
-                pdf.setFontSize(12);
-                pdf.setTextColor('#000000');
-                pdf.text(`Player: ${player.name} ${player.shirtNumber ? `(#${player.shirtNumber})` : ''} | Position: ${player.position || 'N/A'}`, pageMargin, currentY);
-                currentY += 6;
-                pdf.text(`Log Date: ${logDateInput.value} | D.O.B: ${player.dob || 'N/A'} (Age: ${playerAgeSpan.textContent || 'N/A'})`, pageMargin, currentY);
-                currentY += 10;
-                pdf.setDrawColor('#e0e0e0');
-                pdf.line(pageMargin, currentY - 5, contentWidth + pageMargin, currentY - 5);
-
-                const allSections = document.querySelectorAll('#dynamics-form fieldset');
-                for (const section of allSections) {
-                    await addElementToPdf(section);
-                }
-
-                pdf.save(`${player.name.replace(/\s+/g, '_')}_Log.pdf`);
-                document.body.classList.remove('pdf-prepare');
-                showToast("PDF saved successfully.");
-            };
-
             const handleReset = () => {
-                playerSelect.value = ""; activePlayerId = null;
-                playerNameInput.value = "";
-                clearForm();
-                updateAndSave();
-                showToast("Form cleared for new player.");
+                if(activePlayerId){
+                    const player = players.find(p => p.id === activePlayerId);
+                    if(confirm(`Are you sure you want to clear all data for ${player.name}? This will reset all fields.`)){
+                        player.data = generateNewLogData();
+                        populateForm(activePlayerId);
+                        saveData();
+                        showToast(`Form for ${player.name} has been cleared.`);
+                    }
+                } else {
+                    clearForm();
+                    showToast("Form cleared.");
+                }
             };
             
+            // --- Initialization ---
+
             function updateAndSave() {
                 updatePlayerDropdown();
-                if (activePlayerId) { populateForm(activePlayerId); } 
-                else { clearForm(); }
+                if (activePlayerId) {
+                    populateForm(activePlayerId);
+                } else {
+                    clearForm();
+                }
                 saveData();
             }
             
             function init() {
                 loadData();
                 renderLogForm();
-                updateAndSave();
+                updatePlayerDropdown();
+                if(activePlayerId && players.some(p=>p.id === activePlayerId)) {
+                    playerSelect.value = activePlayerId;
+                } else if (players.length > 0) {
+                    activePlayerId = players[0].id;
+                    playerSelect.value = activePlayerId;
+                } else {
+                    activePlayerId = null;
+                }
                 
+                if (activePlayerId) {
+                    populateForm(activePlayerId);
+                } else {
+                    clearForm();
+                }
+
+                // Attach Event Listeners
                 addPlayerBtn.addEventListener('click', handleAddPlayer);
                 deletePlayerBtn.addEventListener('click', handleDeletePlayer);
                 playerSelect.addEventListener('change', handlePlayerSelect);
-                dynamicsForm.addEventListener('input', handleFormInput);
-                playerDetailsSection.addEventListener('input', handleFormInput);
+                document.getElementById('dynamics-form').addEventListener('input', handleFormInput);
+                document.getElementById('player-details-section').addEventListener('input', handleFormInput);
+                uploadPictureInput.addEventListener('change', handlePictureUpload);
                 exportBtn.addEventListener('click', handleExport);
+                pdfBtn.addEventListener('click', handleSaveAsPdf);
                 importFile.addEventListener('change', handleImport);
                 resetBtn.addEventListener('click', handleReset);
-                pdfBtn.addEventListener('click', handleSaveAsPdf);
+                
                 playerNameInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); addPlayerBtn.click(); }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addPlayerBtn.click();
+                    }
                 });
             }
-
+            
             init();
+
         });
     </script>
 </body>
