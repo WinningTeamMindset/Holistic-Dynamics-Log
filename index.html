@@ -112,6 +112,46 @@
             cursor: pointer;
             border: 2px solid #1f2937;
         }
+        /* PDF Export Styles */
+        .pdf-export-mode {
+            background-color: white !important;
+            color: black !important;
+        }
+        .pdf-export-mode .bg-gray-900,
+        .pdf-export-mode .bg-gray-800,
+        .pdf-export-mode .bg-gray-700\/50 {
+            background-color: white !important;
+        }
+        .pdf-export-mode .text-gray-200,
+        .pdf-export-mode .text-gray-300,
+        .pdf-export-mode .text-gray-400,
+        .pdf-export-mode .text-white {
+            color: black !important;
+        }
+        .pdf-export-mode .border-gray-600,
+        .pdf-export-mode .border-gray-700 {
+            border-color: #cccccc !important;
+        }
+        .pdf-export-mode .border-teal-500 {
+            border-color: #14b8a6 !important;
+        }
+        .pdf-export-mode .text-teal-400 {
+            color: #14b8a6 !important;
+        }
+        .pdf-export-mode #player-age {
+            background-color: #f3f4f6 !important;
+        }
+        .pdf-export-mode .custom-checkbox {
+            background-color: #e5e7eb;
+            border-color: #9ca3af;
+        }
+        .pdf-export-mode .custom-checkbox:checked {
+            background-color: #14b8a6;
+            border-color: #0d9488;
+        }
+        .pdf-export-mode #player-picture {
+            border-color: #cccccc !important;
+        }
     </style>
 </head>
 <body class="h-full text-gray-200 p-2 sm:p-4 md:p-6 lg:p-8 bg-gray-900">
@@ -824,34 +864,57 @@
                 }
                 showToast("Generating PDF... Please wait.");
                 const player = players.find(p => p.id === activePlayerId);
-                
-                const { jsPDF } = window.jspdf;
-                const pdfContent = document.getElementById('pdf-content');
-                const logForm = document.getElementById('log-form');
-                
-                // Temporarily clone and prepare for PDF
-                const pdfContainer = document.createElement('div');
-                const pdfHeader = pdfContent.cloneNode(true);
-                const pdfMain = logForm.cloneNode(true);
-                pdfContainer.appendChild(pdfHeader);
-                pdfContainer.appendChild(pdfMain);
-                document.body.appendChild(pdfContainer);
 
-                html2canvas(pdfContainer, { backgroundColor: '#111827', scale: 2 }).then(canvas => {
-                    document.body.removeChild(pdfContainer); // Clean up clone
+                document.body.classList.add('pdf-export-mode');
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 10;
+                const contentWidth = pageWidth - (margin * 2);
+                let currentY = margin;
+
+                const addElementToPdf = async (element) => {
+                    const canvas = await html2canvas(element, { 
+                        scale: 2,
+                        backgroundColor: null,
+                        useCORS: true,
+                    });
                     const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-                    const imgWidth = canvas.width;
-                    const imgHeight = canvas.height;
-                    const ratio = imgWidth / imgHeight;
-                    const pdfWidth = pageWidth;
-                    const pdfHeight = pdfWidth / ratio;
-                    
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                    pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
-                });
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const pdfHeight = (imgProps.height * contentWidth) / imgProps.width;
+
+                    if (currentY + pdfHeight > pageHeight - margin && currentY > margin) {
+                        pdf.addPage();
+                        currentY = margin;
+                    }
+
+                    pdf.addImage(imgData, 'PNG', margin, currentY, contentWidth, pdfHeight);
+                    currentY += pdfHeight + 5;
+                };
+
+                (async () => {
+                    try {
+                        const headerElement = document.getElementById('pdf-content');
+                        const sections = document.querySelectorAll('#log-form fieldset');
+                        
+                        await addElementToPdf(headerElement);
+
+                        for (const section of sections) {
+                            await addElementToPdf(section);
+                        }
+
+                        pdf.save(`${player.name.replace(/\s+/g, '_')}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
+                        showToast("PDF generated successfully!");
+
+                    } catch (error) {
+                        console.error("PDF generation failed:", error);
+                        showToast("Error generating PDF.");
+                    } finally {
+                        document.body.classList.remove('pdf-export-mode');
+                    }
+                })();
             };
 
             const handleImport = (e) => {
