@@ -878,7 +878,7 @@
                 const addElementToPdf = async (element) => {
                     const canvas = await html2canvas(element, { 
                         scale: 2,
-                        backgroundColor: null,
+                        backgroundColor: '#ffffff', // Explicitly set white background
                         useCORS: true,
                     });
                     const imgData = canvas.toDataURL('image/png');
