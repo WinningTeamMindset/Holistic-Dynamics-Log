@@ -455,12 +455,10 @@
                         // Data Migration: Ensure all players have the new data structures
                         const defaultData = generateNewLogData();
                         players.forEach(player => {
-                            if (!player.data.mindsetMatrix) {
-                                player.data.mindsetMatrix = defaultData.mindsetMatrix;
-                            }
-                            if (!player.data.mentalSkills) {
-                                player.data.mentalSkills = defaultData.mentalSkills;
-                            }
+                            player.data = { ...defaultData, ...player.data };
+                            player.data.mindsetMatrix = { ...defaultData.mindsetMatrix, ...(player.data.mindsetMatrix || {}) };
+                            player.data.mentalSkills = { ...defaultData.mentalSkills, ...(player.data.mentalSkills || {}) };
+                            player.data.comments = { ...defaultData.comments, ...(player.data.comments || {}) };
                         });
                     }
                     if (savedActivePlayer) {
