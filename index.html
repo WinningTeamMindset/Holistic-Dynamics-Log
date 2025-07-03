@@ -276,19 +276,21 @@
                     ]
                 },
                 {
-                    title: "SECTION 2: PSYCHOLOGICAL & BEHAVIORAL PROFILE",
-                    description: "This section is the athlete’s 'Operating System.' It reveals their default tendencies under pressure.",
+                    title: "SECTION 2: PSYCHOLOGICAL & PERSONALITY PROFILE",
+                    description: "This section is the athlete’s 'Operating System.' It reveals their default tendencies, personality traits, and processing styles under pressure.",
                     params: [
+                        { id: 'social_energy', label: 'Social Energy Source', options: ['Introvert (Recharges alone)', 'Extrovert (Recharges with others)', 'Ambivert (Balanced)'] },
                         { id: 'motivation', label: 'Primary Motivational Driver', options: ['Towards Pleasure', 'Away From Pain'] },
                         { id: 'validation', label: 'Source of Validation', options: ['Internal', 'External'] },
                         { id: 'processing', label: 'Information Processing Style', options: ["Global (The 'Why')", "Detail (The 'How')"] },
-                        { id: 'change', label: 'Response to Change & Novelty', options: ['Prefers Sameness', 'Energized by Difference'] },
-                        { id: 'social', label: 'Primary Social Orientation', options: ['Independent', 'Co-operative'] }
+                        { id: 'decision_style', label: 'Decision Making Style', options: ['Analytical / Deliberate', 'Intuitive / Instinctive'] },
+                        { id: 'feedback_response', label: 'Response to Feedback', options: ['Receptive / Open', 'Defensive / Closed', 'Indifferent'] },
+                        { id: 'risk_profile', label: 'Risk Profile', options: ['Risk-Averse / Cautious', 'Calculated Risk-Taker', 'High Risk-Taker'] }
                     ]
                 },
                  {
-                    title: "SECTION 3: TRAINING & PERFORMANCE DYNAMICS",
-                    description: "This is the core of the observation. It logs how the athlete behaves within the training environment itself.",
+                    title: "SECTION 3: ELITE BEHAVIOR & PERFORMANCE DYNAMICS",
+                    description: "This is the core of the observation. It logs how the athlete behaves and applies their mindset within the training and competitive environment.",
                     params: [
                         { id: 'context', label: 'Context of Observation', options: ['Low-Pressure', 'Moderate-Pressure', 'High-Pressure'] },
                         { id: 'focus', label: 'Focus & Activation', options: ['Proactive', 'Standard', 'Distracted'] },
@@ -309,7 +311,7 @@
                     ]
                 },
                 {
-                    title: "SECTION 5: PSYCHOLOGICAL PERFORMANCE COMPETENCIES",
+                    title: "SECTION 5: ELITE MINDSET COMPETENCIES",
                     description: "A comprehensive assessment of key psychological traits and skills that underpin elite performance. Score each parameter based on observation.",
                     type: 'mindset_matrix',
                     subsections: [
