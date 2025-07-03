@@ -400,19 +400,19 @@
                     logDateTo: new Date().toISOString().split('T')[0]
                 };
                 logStructure.forEach(section => {
-                    if (section.type === 'mental_skills') {
+                    if (section.type === 'mental_skills' && section.params) {
                         data.mentalSkills = {};
                         section.params.forEach(param => {
                             data.mentalSkills[param.id] = { checked: false, score: '', comment: '' };
                         });
-                    } else if (section.type === 'mindset_matrix') {
+                    } else if (section.type === 'mindset_matrix' && section.subsections) {
                         data.mindsetMatrix = {};
                         section.subsections.forEach(sub => {
                             sub.params.forEach(param => {
                                 data.mindsetMatrix[param.id] = { score: '', comment: '' };
                             });
                         });
-                    } else {
+                    } else if (section.params) {
                         if (!data['comments']) data['comments'] = {};
                         section.params.forEach(param => {
                             data[param.id] = '';
@@ -483,7 +483,7 @@
                             <p class="text-sm text-gray-400 mb-4 px-2">${section.description}</p>
                             <div class="table-container">
                     `;
-                    if (section.type === 'mindset_matrix') {
+                    if (section.type === 'mindset_matrix' && section.subsections) {
                         section.subsections.forEach(sub => {
                             html += `<h3 class="text-lg font-medium text-gray-300 mt-6 mb-2 px-2">${sub.title}</h3>`;
                             html += `<table class="min-w-full divide-y divide-gray-700">
@@ -504,7 +504,7 @@
                             });
                             html += `</tbody></table>`;
                         });
-                    } else if (section.type === 'mental_skills') {
+                    } else if (section.type === 'mental_skills' && section.params) {
                         html += `
                                 <table class="min-w-full divide-y divide-gray-700">
                                     <thead class="bg-gray-700/50">
@@ -545,7 +545,7 @@
                                     <button id="add-session-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add New Session</button>
                                 </div>
                                 `;
-                    } else {
+                    } else if (section.params) {
                         html += `
                                 <table class="min-w-full divide-y divide-gray-700">
                                     <thead class="bg-gray-700/50">
